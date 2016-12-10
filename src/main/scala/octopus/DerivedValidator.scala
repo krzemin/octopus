@@ -29,7 +29,7 @@ object DerivedValidator extends LowPriorityDerivedValidator0 {
     DerivedValidator(
       (elems: M[T]) =>
         elems.toList.zipWithIndex.flatMap { case (elem, idx) =>
-          v.validate(elem).map(idx.toString :: _)
+          v.validate(elem).map(CollectionIndex(idx) :: _)
         }
     )
 
@@ -41,7 +41,7 @@ object DerivedValidator extends LowPriorityDerivedValidator0 {
   implicit def mapValidator[K, V](implicit v: Validator[V]): DerivedValidator[Map[K, V]] =
     DerivedValidator(
       (map: Map[K, V]) => map.toList.flatMap { case (key, value) =>
-        v.validate(value).map(key.toString :: _)
+        v.validate(value).map(MapKey(key.toString) :: _)
       }
     )
 }
@@ -55,7 +55,7 @@ trait LowPriorityDerivedValidator0 extends LowPriorityDerivedValidator1 {
                                                           tv: Validator[T]): DerivedValidator[FieldType[L, H] :: T] =
     DerivedValidator(
       (hlist: FieldType[L, H] :: T) =>
-        hv.value.validate(hlist.head).map(label.value.name :: _) ++ tv.validate(hlist.tail)
+        hv.value.validate(hlist.head).map(FieldLabel(label.value) :: _) ++ tv.validate(hlist.tail)
     )
 
   implicit val cnilValidator: DerivedValidator[CNil] = DerivedValidator((cnil: CNil) => null)

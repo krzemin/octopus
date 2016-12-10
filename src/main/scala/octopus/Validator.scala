@@ -57,5 +57,5 @@ object Validator {
   : Validator[T] =
     (obj: T) => rule[U](pred, whenInvalid)
       .validate(sel(gen.to(obj)))
-      .map(field.value.name :: _)
+      .map(FieldLabel(field.value) :: _)
 }

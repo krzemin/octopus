@@ -2,8 +2,8 @@ package octopus
 
 case class ValidationError(message: String, path: FieldPath = FieldPath.empty) {
 
-  def ::(label: String): ValidationError =
-    copy(path = label :: path)
+  def ::(pathElement: PathElement): ValidationError =
+    copy(path = pathElement :: path)
 
   def toPair: (String, String) =
     path.toString -> message

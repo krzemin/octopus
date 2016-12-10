@@ -1,18 +1,32 @@
 package octopus
 
-case class FieldPath(parts: List[String]) extends AnyVal {
+sealed trait PathElement extends Any {
+  def asString: String
+}
 
-  def ::(label: String): FieldPath =
-    copy(label :: parts)
+case class FieldLabel(label: Symbol) extends AnyVal with PathElement {
+  def asString: String = label.name
+}
+
+case class CollectionIndex(index: Int) extends AnyVal with PathElement {
+  def asString: String = index.toString
+}
+
+case class MapKey(key: String) extends AnyVal with PathElement {
+  def asString: String = key
+}
+
+
+case class FieldPath(parts: List[PathElement]) extends AnyVal {
+
+  def ::(element: PathElement): FieldPath =
+    copy(element :: parts)
 
   override def toString: String =
-    parts.mkString(".")
+    parts.map(_.asString).mkString(".")
 }
 
 object FieldPath {
 
   val empty = FieldPath(Nil)
-
-  def fromString(pathStr: String): FieldPath =
-    FieldPath(pathStr.split('.').toList)
 }
