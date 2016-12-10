@@ -72,7 +72,7 @@ val user2 = User(
 
 user1.isValid // : Boolean = true
 
-user1.validate // : List[octopus.ValidationError] = List()
+user1.validateAsEither // : Either[octopus.ValidationError, User] = Right(user1)
 
 user2.isValid // : Boolean = false
 
@@ -109,7 +109,7 @@ See [DESIGN.md](DESIGN.md)
 
 Things to implement/consider:
 
-* [ ] precisely typed field paths (own ADT instead of list of string)
+* [x] precisely typed field paths (own ADT instead of list of string)
 * [ ] abstraction over error message types
 * [ ] write about usage
 * [ ] release an artifact
