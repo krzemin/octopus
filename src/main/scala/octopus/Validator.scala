@@ -3,8 +3,6 @@ package octopus
 import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Lazy, Witness}
 import shapeless.ops.record.Selector
 
-import scala.util.{Failure, Success, Try}
-
 trait Validator[T] {
 
   def validate(obj: T): List[ValidationError]
@@ -38,11 +36,7 @@ object Validator {
   }
 
   private def rule[T](pred: T => Boolean, whenInvalid: String): Validator[T] =
-    (obj: T) => Try(pred(obj)) match {
-      case Success(true) => Nil
-      case Success(false) => List(ValidationError(whenInvalid))
-      case Failure(why) => List(ValidationError(why.getMessage))
-    }
+    (obj: T) => if(pred(obj)) Nil else List(ValidationError(whenInvalid))
 
   private def ruleVC[T, V](pred: V => Boolean, whenInvalid: String)
                           (implicit gen: Generic.Aux[T, V :: HNil]): Validator[T] =
