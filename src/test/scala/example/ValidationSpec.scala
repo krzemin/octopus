@@ -1,10 +1,9 @@
 package example
 
-import example.Domain._
+import example.Domain.{PostalCode, _}
 import octopus._
 import octopus.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
-
 import shapeless.tag.@@
 import shapeless.test.illTyped
 
@@ -37,7 +36,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userId_Valid.isValid mustBe true
 
         userId_Invalid.validate mustBe List(
-          ValidationError("must be positive number")
+          ValidationError(UserId.Err_MustBePositive)
         )
       }
 
@@ -46,22 +45,22 @@ class ValidationSpec extends WordSpec with MustMatchers {
         email_Valid.isValid mustBe true
 
         email_Invalid1.validate mustBe List(
-          ValidationError("must not be empty"),
-          ValidationError("must contain @"),
-          ValidationError("must contain . after @")
+          ValidationError(Email.Err_MustNotBeEmpty),
+          ValidationError(Email.Err_MustContainAt),
+          ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
         email_Invalid2.validate mustBe List(
-          ValidationError("must contain @"),
-          ValidationError("must contain . after @")
+          ValidationError(Email.Err_MustContainAt),
+          ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
         email_Invalid3.validate mustBe List(
-          ValidationError("must contain . after @")
+          ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
         email_Invalid4.validate mustBe List(
-          ValidationError("must contain @")
+          ValidationError(Email.Err_MustContainAt)
         )
       }
 
@@ -70,12 +69,12 @@ class ValidationSpec extends WordSpec with MustMatchers {
         postalCode_Valid.isValid mustBe true
 
         postalCode_Invalid1.validate mustBe List(
-          ValidationError("must be of length 5"),
-          ValidationError("must contain only digits")
+          ValidationError(PostalCode.Err_MustBeLengthOf5),
+          ValidationError(PostalCode.Err_MustContainOnlyDigits)
         )
 
         postalCode_Invalid2.validate mustBe List(
-          ValidationError("must be of length 5")
+          ValidationError(PostalCode.Err_MustBeLengthOf5)
         )
       }
     }
@@ -87,10 +86,10 @@ class ValidationSpec extends WordSpec with MustMatchers {
         address_Valid.isValid mustBe true
 
         address_Invalid1.validateAsFieldErrMapping mustBe List(
-          "postalCode" -> "must be of length 5",
-          "postalCode" -> "must contain only digits",
-          "city" -> "must not be empty",
-          "street" -> "must not be empty"
+          "postalCode" -> PostalCode.Err_MustBeLengthOf5,
+          "postalCode" -> PostalCode.Err_MustContainOnlyDigits,
+          "city" -> Address.Err_MustNotBeEmpty,
+          "street" -> Address.Err_MustNotBeEmpty
         )
       }
 
@@ -99,17 +98,17 @@ class ValidationSpec extends WordSpec with MustMatchers {
         user_Valid.isValid mustBe true
 
         user_Invalid1.validateAsFieldErrMapping mustBe List(
-          "id" -> "must be positive number",
-          "email" -> "must contain @",
-          "email" -> "must contain . after @",
-          "address.postalCode" -> "must be of length 5",
-          "address.postalCode" -> "must contain only digits",
-          "address.city" -> "must not be empty",
-          "address.street" -> "must not be empty"
+          "id" -> UserId.Err_MustBePositive,
+          "email" -> Email.Err_MustContainAt,
+          "email" -> Email.Err_MustContainDotAfterAt,
+          "address.postalCode" -> PostalCode.Err_MustBeLengthOf5,
+          "address.postalCode" -> PostalCode.Err_MustContainOnlyDigits,
+          "address.city" -> Address.Err_MustNotBeEmpty,
+          "address.street" -> Address.Err_MustNotBeEmpty
         )
 
         user_Invalid2.validateAsFieldErrMapping mustBe List(
-          "id" -> "must be positive number"
+          "id" -> UserId.Err_MustBePositive
         )
       }
     }
@@ -130,7 +129,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
         some_email_Valid.isValid mustBe true
 
         some_email_Invalid4.validate mustBe List(
-          ValidationError("must contain @")
+          ValidationError(Email.Err_MustContainAt)
         )
       }
     }
@@ -145,8 +144,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.isValid mustBe true
 
         userIds_Invalid.validateAsFieldErrMapping mustBe List(
-          "2" -> "must be positive number",
-          "3" -> "must be positive number"
+          "2" -> UserId.Err_MustBePositive,
+          "3" -> UserId.Err_MustBePositive
         )
       }
 
@@ -155,8 +154,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toList.isValid mustBe true
 
         userIds_Invalid.toList.validateAsFieldErrMapping mustBe List(
-          "2" -> "must be positive number",
-          "3" -> "must be positive number"
+          "2" -> UserId.Err_MustBePositive,
+          "3" -> UserId.Err_MustBePositive
         )
       }
 
@@ -165,8 +164,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toArray.isValid mustBe true
 
         userIds_Invalid.toArray.validateAsFieldErrMapping mustBe List(
-          "2" -> "must be positive number",
-          "3" -> "must be positive number"
+          "2" -> UserId.Err_MustBePositive,
+          "3" -> UserId.Err_MustBePositive
         )
       }
 
@@ -175,9 +174,9 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toSet.isValid mustBe true
 
         Set(email_Valid, email_Invalid2, email_Invalid3).validateAsFieldErrMapping mustBe List(
-          "1" -> "must contain @",
-          "1" -> "must contain . after @",
-          "2" -> "must contain . after @"
+          "1" -> Email.Err_MustContainAt,
+          "1" -> Email.Err_MustContainDotAfterAt,
+          "2" -> Email.Err_MustContainDotAfterAt
         )
       }
     }
@@ -188,11 +187,12 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         Map(20 -> userId_Valid, 30 -> userId_Valid).isValid mustBe true
 
-        Map(30 -> email_Invalid2, 20 -> email_Valid, 40 -> email_Invalid3).validateAsFieldErrMapping mustBe List(
-          "30" -> "must contain @",
-          "30" -> "must contain . after @",
-          "40" -> "must contain . after @"
-        )
+        Map(30 -> email_Invalid2, 20 -> email_Valid, 40 -> email_Invalid3)
+          .validateAsFieldErrMapping mustBe List(
+            "30" -> Email.Err_MustContainAt,
+            "30" -> Email.Err_MustContainDotAfterAt,
+            "40" -> Email.Err_MustContainDotAfterAt
+          )
       }
     }
 
@@ -227,12 +227,12 @@ class ValidationSpec extends WordSpec with MustMatchers {
         )
 
         user_Invalid1.validateAsFieldErrMapping mustBe List(
-          "email" -> "must contain @",
-          "email" -> "must contain . after @",
-          "address.postalCode" -> "must be of length 5",
-          "address.postalCode" -> "must contain only digits",
-          "address.city" -> "must not be empty",
-          "address.street" -> "must not be empty"
+          "email" -> Email.Err_MustContainAt,
+          "email" -> Email.Err_MustContainDotAfterAt,
+          "address.postalCode" -> PostalCode.Err_MustBeLengthOf5,
+          "address.postalCode" -> PostalCode.Err_MustContainOnlyDigits,
+          "address.city" -> Address.Err_MustNotBeEmpty,
+          "address.street" -> Address.Err_MustNotBeEmpty
         )
 
         user_Invalid2.isValid mustBe true
@@ -248,7 +248,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
       email_Valid.validateAsEither mustBe Right(email_Valid)
 
       email_Invalid4.validateAsEither mustBe Left(List(
-        ValidationError("must contain @")
+        ValidationError(Email.Err_MustContainAt)
       ))
     }
 
