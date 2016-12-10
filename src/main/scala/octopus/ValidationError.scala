@@ -9,5 +9,5 @@ case class ValidationError(message: String, path: FieldPath = FieldPath.empty) {
     path.asString -> message
 
   def asString: String =
-    s"$path: $message"
+    s"${path.asString}: $message"
 }

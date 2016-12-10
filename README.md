@@ -72,11 +72,11 @@ val user2 = User(
 
 user1.isValid // : Boolean = true
 
-user1.validateAsEither // : Either[octopus.ValidationError, User] = Right(user1)
+user1.validate.toEither // : Either[octopus.ValidationError, User] = Right(user1)
 
 user2.isValid // : Boolean = false
 
-user2.validateAsFieldErrMapping
+user2.validate.toFieldErrMapping
 // : List[(String, String)] = List(
 //     (id,must be positive number), 
 //     (email,must contain . after @),

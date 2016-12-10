@@ -22,13 +22,18 @@ case class FieldPath(parts: List[PathElement]) extends AnyVal {
   def ::(element: PathElement): FieldPath =
     copy(element :: parts)
 
-  def asString: String =
-    parts.tail.foldLeft(parts.head.asString) {
-      case (buff, element: FieldLabel) =>
-        s"$buff.${element.asString}"
-      case (buff, element) =>
-        buff + element.asString
+  def asString: String = {
+    if(parts.isEmpty) {
+      ""
+    } else {
+      parts.tail.foldLeft(parts.head.asString) {
+        case (buff, element: FieldLabel) =>
+          s"$buff.${element.asString}"
+        case (buff, element) =>
+          buff + element.asString
+      }
     }
+  }
 }
 
 object FieldPath {

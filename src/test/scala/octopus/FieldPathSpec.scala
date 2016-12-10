@@ -11,6 +11,11 @@ class FieldPathSpec extends WordSpec with MustMatchers{
 
     "asString" should {
 
+      "support empty path" in {
+
+        PNil.asString mustBe ""
+      }
+
       "support field names" in {
 
         (FieldLabel('label1) :: PNil).asString mustBe "label1"

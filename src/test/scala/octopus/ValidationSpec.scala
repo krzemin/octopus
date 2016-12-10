@@ -34,7 +34,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         userId_Valid.isValid mustBe true
 
-        userId_Invalid.validate mustBe List(
+        userId_Invalid.validate.errors mustBe List(
           ValidationError(UserId.Err_MustBePositive)
         )
       }
@@ -43,22 +43,22 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         email_Valid.isValid mustBe true
 
-        email_Invalid1.validate mustBe List(
+        email_Invalid1.validate.errors mustBe List(
           ValidationError(Email.Err_MustNotBeEmpty),
           ValidationError(Email.Err_MustContainAt),
           ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
-        email_Invalid2.validate mustBe List(
+        email_Invalid2.validate.errors mustBe List(
           ValidationError(Email.Err_MustContainAt),
           ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
-        email_Invalid3.validate mustBe List(
+        email_Invalid3.validate.errors mustBe List(
           ValidationError(Email.Err_MustContainDotAfterAt)
         )
 
-        email_Invalid4.validate mustBe List(
+        email_Invalid4.validate.errors mustBe List(
           ValidationError(Email.Err_MustContainAt)
         )
       }
@@ -67,12 +67,12 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         postalCode_Valid.isValid mustBe true
 
-        postalCode_Invalid1.validate mustBe List(
+        postalCode_Invalid1.validate.errors mustBe List(
           ValidationError(PostalCode.Err_MustBeLengthOf5),
           ValidationError(PostalCode.Err_MustContainOnlyDigits)
         )
 
-        postalCode_Invalid2.validate mustBe List(
+        postalCode_Invalid2.validate.errors mustBe List(
           ValidationError(PostalCode.Err_MustBeLengthOf5)
         )
       }
@@ -84,7 +84,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         address_Valid.isValid mustBe true
 
-        address_Invalid1.validateAsFieldErrMapping mustBe List(
+        address_Invalid1.validate.toFieldErrMapping mustBe List(
           "postalCode" -> PostalCode.Err_MustBeLengthOf5,
           "postalCode" -> PostalCode.Err_MustContainOnlyDigits,
           "city" -> Address.Err_MustNotBeEmpty,
@@ -96,7 +96,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         user_Valid.isValid mustBe true
 
-        user_Invalid1.validateAsFieldErrMapping mustBe List(
+        user_Invalid1.validate.toFieldErrMapping mustBe List(
           "id" -> UserId.Err_MustBePositive,
           "email" -> Email.Err_MustContainAt,
           "email" -> Email.Err_MustContainDotAfterAt,
@@ -106,7 +106,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
           "address.street" -> Address.Err_MustNotBeEmpty
         )
 
-        user_Invalid2.validateAsFieldErrMapping mustBe List(
+        user_Invalid2.validate.toFieldErrMapping mustBe List(
           "id" -> UserId.Err_MustBePositive
         )
       }
@@ -127,7 +127,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         some_email_Valid.isValid mustBe true
 
-        some_email_Invalid4.validate mustBe List(
+        some_email_Invalid4.validate.errors mustBe List(
           ValidationError(Email.Err_MustContainAt)
         )
       }
@@ -142,7 +142,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         userIds_Valid.isValid mustBe true
 
-        userIds_Invalid.validateAsFieldErrMapping mustBe List(
+        userIds_Invalid.validate.toFieldErrMapping mustBe List(
           "[2]" -> UserId.Err_MustBePositive,
           "[3]" -> UserId.Err_MustBePositive
         )
@@ -152,7 +152,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         userIds_Valid.toList.isValid mustBe true
 
-        userIds_Invalid.toList.validateAsFieldErrMapping mustBe List(
+        userIds_Invalid.toList.validate.toFieldErrMapping mustBe List(
           "[2]" -> UserId.Err_MustBePositive,
           "[3]" -> UserId.Err_MustBePositive
         )
@@ -162,7 +162,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         userIds_Valid.toArray.isValid mustBe true
 
-        userIds_Invalid.toArray.validateAsFieldErrMapping mustBe List(
+        userIds_Invalid.toArray.validate.toFieldErrMapping mustBe List(
           "[2]" -> UserId.Err_MustBePositive,
           "[3]" -> UserId.Err_MustBePositive
         )
@@ -172,7 +172,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         userIds_Valid.toSet.isValid mustBe true
 
-        Set(email_Valid, email_Invalid2, email_Invalid3).validateAsFieldErrMapping mustBe List(
+        Set(email_Valid, email_Invalid2, email_Invalid3).validate.toFieldErrMapping mustBe List(
           "[1]" -> Email.Err_MustContainAt,
           "[1]" -> Email.Err_MustContainDotAfterAt,
           "[2]" -> Email.Err_MustContainDotAfterAt
@@ -187,7 +187,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
         Map(20 -> userId_Valid, 30 -> userId_Valid).isValid mustBe true
 
         Map(30 -> email_Invalid2, 20 -> email_Valid, 40 -> email_Invalid3)
-          .validateAsFieldErrMapping mustBe List(
+          .validate.toFieldErrMapping mustBe List(
             "[30]" -> Email.Err_MustContainAt,
             "[30]" -> Email.Err_MustContainDotAfterAt,
             "[40]" -> Email.Err_MustContainDotAfterAt
@@ -201,13 +201,13 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         shape_circle_Valid.isValid mustBe true
 
-        shape_circle_Invalid.validate mustBe List(
+        shape_circle_Invalid.validate.errors mustBe List(
           ValidationError("radius must be greater than 0")
         )
 
         shape_rectangle_Valid.isValid mustBe true
 
-        shape_rectangle_Invalid.validate mustBe List(
+        shape_rectangle_Invalid.validate.errors mustBe List(
           ValidationError("width must be greater than 0"),
           ValidationError("height must be greater than 0")
         )
@@ -221,11 +221,11 @@ class ValidationSpec extends WordSpec with MustMatchers {
         implicit val postalCodeValidator: Validator[UserId] = Validator[UserId]
           .rule(_.id % 2 == 0, "must be even")
 
-        user_Valid.validateAsFieldErrMapping mustBe List(
+        user_Valid.validate.toFieldErrMapping mustBe List(
           "id" -> "must be even"
         )
 
-        user_Invalid1.validateAsFieldErrMapping mustBe List(
+        user_Invalid1.validate.toFieldErrMapping mustBe List(
           "email" -> Email.Err_MustContainAt,
           "email" -> Email.Err_MustContainDotAfterAt,
           "address.postalCode" -> PostalCode.Err_MustBeLengthOf5,
@@ -242,11 +242,42 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
   "Validator DSL" should {
 
+    "validate as string summary" in {
+
+      address_Valid.validate.toString mustBe
+        s"""$address_Valid
+           |valid
+           |""".stripMargin
+
+      address_Invalid1.validate.toString mustBe
+        s"""$address_Invalid1
+           |invalid:
+           |  postalCode: ${PostalCode.Err_MustBeLengthOf5}
+           |  postalCode: ${PostalCode.Err_MustContainOnlyDigits}
+           |  city: ${Address.Err_MustNotBeEmpty}
+           |  street: ${Address.Err_MustNotBeEmpty}
+           |""".stripMargin
+    }
+
+    "validate as boolean" in {
+
+      email_Valid.validate.isValid mustBe true
+
+      email_Invalid4.validate.isValid mustBe false
+    }
+
+    "validate as option" in {
+
+      email_Valid.validate.toOption mustBe Some(email_Valid)
+
+      email_Invalid4.validate.toOption mustBe None
+    }
+
     "validate as either" in {
 
-      email_Valid.validateAsEither mustBe Right(email_Valid)
+      email_Valid.validate.toEither mustBe Right(email_Valid)
 
-      email_Invalid4.validateAsEither mustBe Left(List(
+      email_Invalid4.validate.toEither mustBe Left(List(
         ValidationError(Email.Err_MustContainAt)
       ))
     }
@@ -257,9 +288,9 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
       def doSomethingWithEmail(email: Email @@ Valid): Unit = ()
 
-      email_Valid.validateAsTaggedEither[Valid].foreach(doSomethingWithEmail)
+      email_Valid.validate.toTaggedEither[Valid].foreach(doSomethingWithEmail)
 
-      illTyped("email_Valid.validateAsEither.foreach(doSomethingWithEmail)")
+      illTyped("email_Valid.validate.toEither.foreach(doSomethingWithEmail)")
     }
   }
 
