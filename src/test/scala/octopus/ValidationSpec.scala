@@ -1,7 +1,6 @@
-package example
+package octopus
 
-import example.Domain.{PostalCode, _}
-import octopus._
+import octopus.ExampleDomain.{PostalCode, _}
 import octopus.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
 import shapeless.tag.@@
@@ -144,8 +143,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.isValid mustBe true
 
         userIds_Invalid.validateAsFieldErrMapping mustBe List(
-          "2" -> UserId.Err_MustBePositive,
-          "3" -> UserId.Err_MustBePositive
+          "[2]" -> UserId.Err_MustBePositive,
+          "[3]" -> UserId.Err_MustBePositive
         )
       }
 
@@ -154,8 +153,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toList.isValid mustBe true
 
         userIds_Invalid.toList.validateAsFieldErrMapping mustBe List(
-          "2" -> UserId.Err_MustBePositive,
-          "3" -> UserId.Err_MustBePositive
+          "[2]" -> UserId.Err_MustBePositive,
+          "[3]" -> UserId.Err_MustBePositive
         )
       }
 
@@ -164,8 +163,8 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toArray.isValid mustBe true
 
         userIds_Invalid.toArray.validateAsFieldErrMapping mustBe List(
-          "2" -> UserId.Err_MustBePositive,
-          "3" -> UserId.Err_MustBePositive
+          "[2]" -> UserId.Err_MustBePositive,
+          "[3]" -> UserId.Err_MustBePositive
         )
       }
 
@@ -174,9 +173,9 @@ class ValidationSpec extends WordSpec with MustMatchers {
         userIds_Valid.toSet.isValid mustBe true
 
         Set(email_Valid, email_Invalid2, email_Invalid3).validateAsFieldErrMapping mustBe List(
-          "1" -> Email.Err_MustContainAt,
-          "1" -> Email.Err_MustContainDotAfterAt,
-          "2" -> Email.Err_MustContainDotAfterAt
+          "[1]" -> Email.Err_MustContainAt,
+          "[1]" -> Email.Err_MustContainDotAfterAt,
+          "[2]" -> Email.Err_MustContainDotAfterAt
         )
       }
     }
@@ -189,9 +188,9 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         Map(30 -> email_Invalid2, 20 -> email_Valid, 40 -> email_Invalid3)
           .validateAsFieldErrMapping mustBe List(
-            "30" -> Email.Err_MustContainAt,
-            "30" -> Email.Err_MustContainDotAfterAt,
-            "40" -> Email.Err_MustContainDotAfterAt
+            "[30]" -> Email.Err_MustContainAt,
+            "[30]" -> Email.Err_MustContainDotAfterAt,
+            "[40]" -> Email.Err_MustContainDotAfterAt
           )
       }
     }

@@ -6,8 +6,8 @@ case class ValidationError(message: String, path: FieldPath = FieldPath.empty) {
     copy(path = pathElement :: path)
 
   def toPair: (String, String) =
-    path.toString -> message
+    path.asString -> message
 
-  override def toString: String =
+  def asString: String =
     s"$path: $message"
 }

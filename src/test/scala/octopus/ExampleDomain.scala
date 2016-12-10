@@ -1,8 +1,7 @@
-package example
+package octopus
 
-import octopus._
 
-object Domain {
+object ExampleDomain {
 
   case class UserId(id: Int) extends AnyVal
 
