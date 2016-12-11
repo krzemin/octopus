@@ -1,10 +1,11 @@
 # Octopus
 
-Octopus is a Scala library for boilerplate-free, structural validation.
+Octopus is a Scala library for boilerplate-free validation.
 
 It defines `Validator[T]` type-class, provide composable DSL for
 defining validation rules for user-defined type and can automatically
-derive validators for 
+derive validators for case classes, tuples, sealed hierarchies and various
+stadard Scala types by composing other defined or derived validators.
 
 ### Example
 
@@ -109,8 +110,8 @@ See [DESIGN.md](DESIGN.md)
 
 Things to implement/consider:
 
-* [x] precisely typed field paths (own ADT instead of list of string)
 * [ ] abstraction over error message types
+* [ ] asynchronous validations
 * [ ] write about usage
 * [ ] release an artifact
 * [ ] scala.js port
@@ -118,10 +119,38 @@ Things to implement/consider:
 
 ## FAQ
 
-#### How it's different that Cats/Scalaz validation type-classes?
+#### How it's different that Cats/Scalaz validation data types?
+
+They main differece between Octopus and Cats/Scalaz validation types is an approach
+to composability of validations.
+
+Cats/Scalaz validations are kind of disjunction types that hold successfully validated
+value or some validation error(s). They can be composed usually with simple combinators
+or applicative builder syntax. When having lot of case classes with many fields and you
+want to compose validators of their fields, you have to do this manually which results
+with rather lot amount of boilerplate code.
+
+Octopus approach is a bit different. The `Validator[T]` type-class holds a function
+that will perform validation at some point of time. There are actually two levels of
+composability: 
+
+* validation rules for single type - can be composed using provided DSL,
+* field validators that composes and create case class validator - that is achieved
+  automatically by using type-class derivation mechanism; still you can override validation
+  rules for certain types in local contexts.
 
 #### What about asynchronous validations?
 
+When defining validators usually we use predicate functions `T => Boolean` to decide
+satisfiability of certain rule. This work work well as long as we can answer this
+question only having access to value being validated.
+
+But sometimes this restriction is too limiting to decide a validation - in some cases
+it's necessary to query some external data source (like database). Thus, we would
+want to have asynchronous predicates like `T => Future[Boolean]`.
+
+Currently Octopus doesn't support asynchronous validations. You can always deal with
+them in another layer of your application.
 
 ## License
 
