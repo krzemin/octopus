@@ -188,10 +188,10 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
         Map(30 -> email_Invalid2, 20 -> email_Valid, 40 -> email_Invalid3)
           .validate.toFieldErrMapping mustBe List(
-            "[30]" -> Email.Err_MustContainAt,
-            "[30]" -> Email.Err_MustContainDotAfterAt,
-            "[40]" -> Email.Err_MustContainDotAfterAt
-          )
+          "[30]" -> Email.Err_MustContainAt,
+          "[30]" -> Email.Err_MustContainDotAfterAt,
+          "[40]" -> Email.Err_MustContainDotAfterAt
+        )
       }
     }
 
@@ -242,7 +242,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
 
       "validate using 'ruleCatchOnly'" in {
 
-        implicit val validator = PositiveInputNumber.validator1
+        implicit val validator = PositiveInputNumber.validatorCatchOnly
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -254,12 +254,12 @@ class ValidationSpec extends WordSpec with MustMatchers {
           ValidationError("""incorrect number: For input string: "xxx"""")
         )
 
-        the [NullPointerException] thrownBy PositiveInputNumber(null).validate
+        the[NullPointerException] thrownBy PositiveInputNumber(null).validate
       }
 
       "validate using 'ruleCatchNonFatal'" in {
 
-        implicit val validator = PositiveInputNumber.validator2
+        implicit val validator = PositiveInputNumber.validatorCatchNonFatal
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -276,8 +276,67 @@ class ValidationSpec extends WordSpec with MustMatchers {
         )
       }
     }
-  }
 
+    "given validators from various standard scala types" should {
+
+      "validate using 'ruleTry'" in {
+
+        implicit val validator = PositiveInputNumber.validatorTry
+
+        PositiveInputNumber("3.5").validate.isValid mustBe true
+
+        PositiveInputNumber("-2").validate.errors mustBe List(
+          ValidationError(PositiveInputNumber.Err_MustBeGreatherThan0)
+        )
+
+        PositiveInputNumber("xxx").validate.errors mustBe List(
+          ValidationError("""incorrect number: For input string: "xxx"""")
+        )
+
+        PositiveInputNumber(null).validate.errors mustBe List(
+          ValidationError("""incorrect number: null""")
+        )
+      }
+
+      "validate using 'ruleEither'" in {
+
+        implicit val validator = PositiveInputNumber.validatorEither
+
+        PositiveInputNumber("3.5").validate.isValid mustBe true
+
+        PositiveInputNumber("-2").validate.errors mustBe List(
+          ValidationError(PositiveInputNumber.Err_MustBeGreatherThan0)
+        )
+
+        PositiveInputNumber("xxx").validate.errors mustBe List(
+          ValidationError("not a float")
+        )
+
+        PositiveInputNumber(null).validate.errors mustBe List(
+          ValidationError("not a float")
+        )
+      }
+
+      "validate using 'ruleOption'" in {
+
+        implicit val validator = PositiveInputNumber.validatorOption
+
+        PositiveInputNumber("3.5").validate.isValid mustBe true
+
+        PositiveInputNumber("-2").validate.errors mustBe List(
+          ValidationError(PositiveInputNumber.Err_MustBeGreatherThan0)
+        )
+
+        PositiveInputNumber("xxx").validate.errors mustBe List(
+          ValidationError("""incorrect number: None""")
+        )
+
+        PositiveInputNumber(null).validate.errors mustBe List(
+          ValidationError("""incorrect number: None""")
+        )
+      }
+    }
+  }
 
   "Validator DSL" should {
 

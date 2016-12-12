@@ -1,5 +1,7 @@
 package octopus
 
+import scala.util.Try
+
 
 object ExampleDomain {
 
@@ -87,13 +89,24 @@ object ExampleDomain {
   object PositiveInputNumber {
 
     val Err_MustBeGreatherThan0 = "must be greater than 0"
-    def Err_IncorrectNumber(reason: Throwable) = s"incorrect number: ${reason.getMessage}"
+    def Err_IncorrectNumber(reason: String): String = s"incorrect number: $reason"
+    def Err_IncorrectNumber(reason: Throwable): String = Err_IncorrectNumber(reason.getMessage)
 
-    val validator1: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+    def isFloat(s: String): Boolean = s != null && Try(s.toFloat).isSuccess
+
+    val validatorCatchOnly: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
       .ruleCatchOnly[NumberFormatException](_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
 
-    val validator2: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+    val validatorCatchNonFatal: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
       .ruleCatchNonFatal(_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
-  }
 
+    val validatorTry: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+      .ruleTry(n => Try(n.numberStr.toFloat).map(_ > 0), Err_MustBeGreatherThan0, Err_IncorrectNumber)
+
+    val validatorEither: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+      .ruleEither(n => Either.cond(isFloat(n.numberStr), n.numberStr.toFloat > 0, "not a float"), Err_MustBeGreatherThan0)
+
+    val validatorOption: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+      .ruleOption(n => Try(n.numberStr.toFloat).toOption.map(_ > 0), Err_MustBeGreatherThan0, Err_IncorrectNumber("None"))
+  }
 }

@@ -4,6 +4,7 @@ import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Lazy, Witness}
 import shapeless.ops.record.Selector
 
 import scala.reflect.ClassTag
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 trait Validator[T] {
@@ -14,6 +15,8 @@ trait Validator[T] {
 object Validator {
 
   def apply[T]: Validator[T] = (_: T) => Nil
+
+  def invalid[T](error: String): Validator[T] = (_: T) => List(ValidationError(error))
 
   implicit def derived[T](implicit dv: Lazy[DerivedValidator[T]]): Validator[T] =
     dv.value.validator
@@ -42,6 +45,15 @@ object Validator {
 
     def ruleCatchNonFatal(pred: T => Boolean, whenInvalid: String, whenCaught: Throwable => String): Validator[T] =
       v compose Validator.ruleCatchNonFatal(pred, whenInvalid, whenCaught)
+
+    def ruleTry(pred: T => Try[Boolean], whenInvalid: String, whenFailure: Throwable => String): Validator[T] =
+      v compose Validator.ruleTry(pred, whenInvalid, whenFailure)
+
+    def ruleEither(pred: T => Either[String, Boolean], whenInvalid: String): Validator[T] =
+      v compose Validator.ruleEither(pred, whenInvalid)
+
+    def ruleOption(pred: T => Option[Boolean], whenInvalid: String, whenNone: String): Validator[T] =
+      v compose Validator.ruleOption(pred, whenInvalid, whenNone)
   }
 
   private def rule[T](pred: T => Boolean, whenInvalid: String): Validator[T] =
@@ -76,5 +88,26 @@ object Validator {
     } catch {
       case NonFatal(ex) =>
         List(ValidationError(whenCaught(ex)))
+    }
+
+  private def ruleTry[T](pred: T => Try[Boolean], whenInvalid: String, whenFailure: Throwable => String): Validator[T] =
+    (obj: T) => pred(obj) match {
+      case Success(true) => Nil
+      case Success(false) => List(ValidationError(whenInvalid))
+      case Failure(why) => List(ValidationError(whenFailure(why)))
+    }
+
+  private def ruleEither[T](pred: T => Either[String, Boolean], whenInvalid: String): Validator[T] =
+    (obj: T) => pred(obj) match {
+      case Right(true) => Nil
+      case Right(false) => List(ValidationError(whenInvalid))
+      case Left(why) => List(ValidationError(why))
+    }
+
+  private def ruleOption[T](pred: T => Option[Boolean], whenInvalid: String, whenNone: String): Validator[T] =
+    (obj: T) => pred(obj) match {
+      case Some(true) => Nil
+      case Some(false) => List(ValidationError(whenInvalid))
+      case None => List(ValidationError(whenNone))
     }
 }
