@@ -1,4 +1,4 @@
-# Octopus
+# Octopus [![Build Status](https://travis-ci.org/krzemin/octopus.svg?branch=master)](https://travis-ci.org/krzemin/octopus)
 
 Octopus is a Scala library for boilerplate-free validation.
 
