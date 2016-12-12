@@ -293,22 +293,45 @@ class ValidationSpec extends WordSpec with MustMatchers {
       illTyped("email_Valid.validate.toEither.foreach(doSomethingWithEmail)")
     }
 
-    "be able to validate on already validated result" in {
-
-      email_Valid
-        .validate
-        .thenValidate(Validator[Email])
-        .isValid mustBe true
+    "compose validation with already validated result" should {
 
       val emailWithDigitValidator = Validator[Email]
         .rule(_.address.exists(_.isDigit), "must contain digit")
 
-      email_Valid
-        .validate
-        .thenValidate(emailWithDigitValidator)
-        .errors mustBe List(
-        ValidationError("must contain digit")
-      )
+      "alsoValidate" should {
+
+        "validate eagerly" in {
+
+          email_Valid
+            .validate
+            .alsoValidate(emailWithDigitValidator)
+            .errors mustBe List(
+            ValidationError("must contain digit")
+          )
+
+          email_Invalid3
+            .validate
+            .alsoValidate(emailWithDigitValidator)
+            .errors.map(_.message) must contain("must contain digit")
+        }
+      }
+
+      "thenValidate" should {
+        "validate in short-circuit manner" in {
+
+          email_Valid
+            .validate
+            .thenValidate(emailWithDigitValidator)
+            .errors mustBe List(
+            ValidationError("must contain digit")
+          )
+
+          email_Invalid3
+            .validate
+            .thenValidate(emailWithDigitValidator)
+            .errors.map(_.message) must not contain "must contain digit"
+        }
+      }
     }
   }
 
