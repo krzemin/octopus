@@ -238,6 +238,25 @@ class ValidationSpec extends WordSpec with MustMatchers {
       }
     }
 
+    "given trivial validators" should {
+
+      "always pass" in {
+
+        implicit val validator: Validator[UserId] = Validator[UserId]
+
+        userId_Valid.validate.isValid mustBe true
+        userId_Invalid.validate.isValid mustBe true
+      }
+
+      "never pass" in {
+
+        implicit val validator: Validator[UserId] = Validator.invalid("never pass")
+
+        userId_Valid.validate.errors mustBe List(ValidationError("never pass"))
+        userId_Invalid.validate.errors mustBe List(ValidationError("never pass"))
+      }
+    }
+
     "given validators dealing with exceptions" should {
 
       "validate using 'ruleCatchOnly'" in {
