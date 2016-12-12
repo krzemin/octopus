@@ -15,3 +15,9 @@ before_cache:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
