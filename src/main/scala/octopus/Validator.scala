@@ -3,6 +3,9 @@ package octopus
 import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Lazy, Witness}
 import shapeless.ops.record.Selector
 
+import scala.reflect.ClassTag
+import scala.util.control.NonFatal
+
 trait Validator[T] {
 
   def validate(obj: T): List[ValidationError]
@@ -33,6 +36,12 @@ object Validator {
        gen: LabelledGeneric.Aux[T, R],
        sel: Selector.Aux[R, field.T, U]): Validator[T] =
       v compose Validator.ruleField(field, pred, whenInvalid)
+
+    def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean, whenInvalid: String, whenCaught: E => String): Validator[T] =
+      v compose Validator.ruleCatchOnly(pred, whenInvalid, whenCaught)
+
+    def ruleCatchNonFatal(pred: T => Boolean, whenInvalid: String, whenCaught: Throwable => String): Validator[T] =
+      v compose Validator.ruleCatchNonFatal(pred, whenInvalid, whenCaught)
   }
 
   private def rule[T](pred: T => Boolean, whenInvalid: String): Validator[T] =
@@ -52,4 +61,20 @@ object Validator {
     (obj: T) => rule[U](pred, whenInvalid)
       .validate(sel(gen.to(obj)))
       .map(FieldLabel(field.value) :: _)
+
+  private def ruleCatchOnly[T, E <: Throwable : ClassTag](pred: T => Boolean, whenInvalid: String, whenCaught: E => String): Validator[T] =
+    (obj: T) => try {
+      rule(pred, whenInvalid).validate(obj)
+    } catch {
+      case ex if implicitly[ClassTag[E]].runtimeClass.isInstance(ex) =>
+        List(ValidationError(whenCaught(ex.asInstanceOf[E])))
+    }
+
+  private def ruleCatchNonFatal[T](pred: T => Boolean, whenInvalid: String, whenCaught: Throwable => String): Validator[T] =
+    (obj: T) => try {
+      rule(pred, whenInvalid).validate(obj)
+    } catch {
+      case NonFatal(ex) =>
+        List(ValidationError(whenCaught(ex)))
+    }
 }

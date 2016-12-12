@@ -237,6 +237,45 @@ class ValidationSpec extends WordSpec with MustMatchers {
         user_Invalid2.isValid mustBe true
       }
     }
+
+    "given validators dealing with exceptions" should {
+
+      "validate using 'ruleCatchOnly'" in {
+
+        implicit val validator = PositiveInputNumber.validator1
+
+        PositiveInputNumber("3.5").validate.isValid mustBe true
+
+        PositiveInputNumber("-2").validate.errors mustBe List(
+          ValidationError(PositiveInputNumber.Err_MustBeGreatherThan0)
+        )
+
+        PositiveInputNumber("xxx").validate.errors mustBe List(
+          ValidationError("""incorrect number: For input string: "xxx"""")
+        )
+
+        the [NullPointerException] thrownBy PositiveInputNumber(null).validate
+      }
+
+      "validate using 'ruleCatchNonFatal'" in {
+
+        implicit val validator = PositiveInputNumber.validator2
+
+        PositiveInputNumber("3.5").validate.isValid mustBe true
+
+        PositiveInputNumber("-2").validate.errors mustBe List(
+          ValidationError(PositiveInputNumber.Err_MustBeGreatherThan0)
+        )
+
+        PositiveInputNumber("xxx").validate.errors mustBe List(
+          ValidationError("""incorrect number: For input string: "xxx"""")
+        )
+
+        PositiveInputNumber(null).validate.errors mustBe List(
+          ValidationError("""incorrect number: null""")
+        )
+      }
+    }
   }
 
 
@@ -317,6 +356,7 @@ class ValidationSpec extends WordSpec with MustMatchers {
       }
 
       "thenValidate" should {
+
         "validate in short-circuit manner" in {
 
           email_Valid

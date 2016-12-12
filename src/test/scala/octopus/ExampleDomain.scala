@@ -81,4 +81,19 @@ object ExampleDomain {
       .rule(_.width > 0, Err_WidthMustBePositive)
       .rule(_.height > 0, Err_HeightMustBePositive)
   }
+
+  case class PositiveInputNumber(numberStr: String)
+
+  object PositiveInputNumber {
+
+    val Err_MustBeGreatherThan0 = "must be greater than 0"
+    def Err_IncorrectNumber(reason: Throwable) = s"incorrect number: ${reason.getMessage}"
+
+    val validator1: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+      .ruleCatchOnly[NumberFormatException](_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
+
+    val validator2: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
+      .ruleCatchNonFatal(_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
+  }
+
 }
