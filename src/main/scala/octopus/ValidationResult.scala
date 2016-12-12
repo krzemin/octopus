@@ -6,6 +6,9 @@ import shapeless.tag.@@
 
 sealed class ValidationResult[T](private val value: T, val errors: List[ValidationError]) {
 
+  def thenValidate(validator: Validator[T]): ValidationResult[T] =
+    new ValidationResult(value, errors ++ validator.validate(value))
+
   def isValid: Boolean =
     errors.isEmpty
 
