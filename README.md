@@ -90,15 +90,14 @@ user2.validate.toFieldErrMapping
 // )
 ```
 
-### How to use it?
+### Getting started
 
-Current status of the library is early proof-of-concept preview. Hope it will be released soon.
+Octopus is currently available for Scala 2.12.
 
-If you want to experiment, you can depend on git project in your sbt project:
+To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-lazy val root = Project("MyProject", file("."))
-  .dependsOn(RootProject(uri("https://github.com/krzemin/octopus.git#master")))
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.1.0"
 ```
 
 ## Usage
@@ -116,7 +115,6 @@ Things to implement/consider:
 * [ ] abstraction over error message types
 * [ ] asynchronous validations
 * [ ] write about usage
-* [ ] release an artifact
 * [ ] scala.js port
 * [ ] write about design details
 
