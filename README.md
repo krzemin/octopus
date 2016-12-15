@@ -101,7 +101,7 @@ To get started with SBT, add following line to your `build.sbt`:
 libraryDependencies += "com.github.krzemin" %% "octopus" % "0.1.1"
 ```
 
-Or you are using Scala.js:
+Or if you are using Scala.js:
 
 ```scala
 libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.1.1"
