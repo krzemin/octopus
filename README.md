@@ -93,13 +93,20 @@ user2.validate.toFieldErrMapping
 
 ### Getting started
 
-Octopus is currently available for Scala 2.12.
+Octopus is currently available for Scala 2.12 and Scala.js.
 
 To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %% "octopus" % "0.1.0"
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.1.1"
 ```
+
+Or you are using Scala.js:
+
+```scala
+libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.1.1"
+```
+
 
 ## Usage
 
@@ -116,7 +123,6 @@ Things to implement/consider:
 * [ ] abstraction over error message types
 * [ ] asynchronous validations
 * [ ] write about usage
-* [ ] scala.js port
 * [ ] write about design details
 
 ## FAQ
