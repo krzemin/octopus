@@ -1,5 +1,4 @@
 
-
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
@@ -33,7 +32,6 @@ lazy val octopusJS = octopus.js
 lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
-  organization := "com.github.krzemin",
   scalaVersion := "2.12.1",
   scalacOptions := commonScalacOptions
 )
@@ -54,6 +52,7 @@ lazy val commonScalacOptions = Seq(
 )
 
 lazy val publishSettings = Seq(
+  organization := "com.github.krzemin",
   homepage := Some(url("https://github.com/krzemin/octopus")),
   licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   scmInfo := Some(ScmInfo(url("https://github.com/krzemin/octopus"), "scm:git:git@github.com:krzemin/octopus.git")),
