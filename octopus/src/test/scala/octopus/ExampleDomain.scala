@@ -94,14 +94,19 @@ object ExampleDomain {
 
     def isFloat(s: String): Boolean = s != null && Try(s.toFloat).isSuccess
 
+    def parseFloat(s: String): Float = {
+      if(s == null) throw new NullPointerException
+      s.toFloat
+    }
+
     val validatorCatchOnly: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
-      .ruleCatchOnly[NumberFormatException](_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
+      .ruleCatchOnly[NumberFormatException](s => parseFloat(s.numberStr) > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
 
     val validatorCatchNonFatal: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
-      .ruleCatchNonFatal(_.numberStr.toFloat > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
+      .ruleCatchNonFatal(s => parseFloat(s.numberStr) > 0, Err_MustBeGreatherThan0, Err_IncorrectNumber)
 
     val validatorTry: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
-      .ruleTry(n => Try(n.numberStr.toFloat).map(_ > 0), Err_MustBeGreatherThan0, Err_IncorrectNumber)
+      .ruleTry(s => Try(parseFloat(s.numberStr)).map(_ > 0), Err_MustBeGreatherThan0, Err_IncorrectNumber)
 
     val validatorEither: Validator[PositiveInputNumber] = Validator[PositiveInputNumber]
       .ruleEither(n => Either.cond(isFloat(n.numberStr), n.numberStr.toFloat > 0, "not a float"), Err_MustBeGreatherThan0)

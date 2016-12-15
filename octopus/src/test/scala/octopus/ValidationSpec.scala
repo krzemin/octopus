@@ -296,7 +296,6 @@ class ValidationSpec
     "given validators from various standard scala types" should {
 
       "validate using 'ruleTry'" in {
-
         implicit val validator = PositiveInputNumber.validatorTry
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
