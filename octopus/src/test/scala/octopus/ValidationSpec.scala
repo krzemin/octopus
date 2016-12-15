@@ -1,14 +1,11 @@
 package octopus
 
-import octopus.ExampleDomain.{PostalCode, _}
+import octopus.ExampleDomain._
 import octopus.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
-import shapeless.tag.@@
-import shapeless.test.illTyped
 
-class ValidationSpec extends WordSpec with MustMatchers {
-
-  import Fixtures._
+class ValidationSpec
+  extends WordSpec with MustMatchers with Fixtures {
 
   "Validation" when {
 
@@ -355,132 +352,6 @@ class ValidationSpec extends WordSpec with MustMatchers {
         )
       }
     }
-  }
-
-  "Validator DSL" should {
-
-    "validate as string summary" in {
-
-      address_Valid.validate.toString mustBe
-        s"""$address_Valid
-           |valid
-           |""".stripMargin
-
-      address_Invalid1.validate.toString mustBe
-        s"""$address_Invalid1
-           |invalid:
-           |  postalCode: ${PostalCode.Err_MustBeLengthOf5}
-           |  postalCode: ${PostalCode.Err_MustContainOnlyDigits}
-           |  city: ${Address.Err_MustNotBeEmpty}
-           |  street: ${Address.Err_MustNotBeEmpty}
-           |""".stripMargin
-    }
-
-    "validate as boolean" in {
-
-      email_Valid.validate.isValid mustBe true
-
-      email_Invalid4.validate.isValid mustBe false
-    }
-
-    "validate as option" in {
-
-      email_Valid.validate.toOption mustBe Some(email_Valid)
-
-      email_Invalid4.validate.toOption mustBe None
-    }
-
-    "validate as either" in {
-
-      email_Valid.validate.toEither mustBe Right(email_Valid)
-
-      email_Invalid4.validate.toEither mustBe Left(List(
-        ValidationError(Email.Err_MustContainAt)
-      ))
-    }
-
-    "validate as tagged either" in {
-
-      trait Valid
-
-      def doSomethingWithEmail(email: Email @@ Valid): Unit = ()
-
-      email_Valid.validate.toTaggedEither[Valid].foreach(doSomethingWithEmail)
-
-      illTyped("email_Valid.validate.toEither.foreach(doSomethingWithEmail)")
-    }
-
-    "compose validation with already validated result" should {
-
-      val emailWithDigitValidator = Validator[Email]
-        .rule(_.address.exists(_.isDigit), "must contain digit")
-
-      "alsoValidate" should {
-
-        "validate eagerly" in {
-
-          email_Valid
-            .validate
-            .alsoValidate(emailWithDigitValidator)
-            .errors mustBe List(
-            ValidationError("must contain digit")
-          )
-
-          email_Invalid3
-            .validate
-            .alsoValidate(emailWithDigitValidator)
-            .errors.map(_.message) must contain("must contain digit")
-        }
-      }
-
-      "thenValidate" should {
-
-        "validate in short-circuit manner" in {
-
-          email_Valid
-            .validate
-            .thenValidate(emailWithDigitValidator)
-            .errors mustBe List(
-            ValidationError("must contain digit")
-          )
-
-          email_Invalid3
-            .validate
-            .thenValidate(emailWithDigitValidator)
-            .errors.map(_.message) must not contain "must contain digit"
-        }
-      }
-    }
-  }
-
-  object Fixtures {
-
-    val userId_Valid = UserId(1)
-    val userId_Invalid = UserId(0)
-
-    val email_Valid = Email("abc@example.com")
-    val email_Invalid1 = Email("")
-    val email_Invalid2 = Email("abc")
-    val email_Invalid3 = Email("abc@xyz")
-    val email_Invalid4 = Email("abc.xyz")
-
-    val postalCode_Valid = PostalCode("00385")
-    val postalCode_Invalid1 = PostalCode("abc")
-    val postalCode_Invalid2 = PostalCode("003850")
-
-    val address_Valid = Address("Love Street", postalCode_Valid, "Los Angeles")
-    val address_Invalid1 = Address("", postalCode_Invalid1, "")
-    val address_Invalid2 = Address("Love Street", postalCode_Valid, "")
-
-    val user_Valid = User(userId_Valid, email_Valid, address_Valid)
-    val user_Invalid1 = User(userId_Invalid, email_Invalid2, address_Invalid1)
-    val user_Invalid2 = User(userId_Invalid, email_Valid, address_Valid)
-
-    val shape_circle_Valid: Shape = Circle(10.5)
-    val shape_circle_Invalid: Shape = Circle(-3.1)
-
-    val shape_rectangle_Valid: Shape = Rectangle(2.5, 4.2)
-    val shape_rectangle_Invalid: Shape = Rectangle(0, -1.3)
   }
 
 }
