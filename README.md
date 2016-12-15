@@ -33,7 +33,7 @@ case class User(id: UserId,
 Let's define validation rules as implicit type class instances.
 
 ```scala
-// Usually you wan't to put them into companion objects
+// Usually you want to put them into companion objects
 // or group them together in a module.
 
 import octopus._
