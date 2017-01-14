@@ -129,7 +129,7 @@ Things to implement/consider:
 
 #### How it's different that Cats/Scalaz validation data types?
 
-They main differece between Octopus and Cats/Scalaz validation types is an approach
+They main difference between Octopus and Cats/Scalaz validation types is an approach
 to composability of validations.
 
 Cats/Scalaz validations are kind of disjunction types that hold successfully validated
