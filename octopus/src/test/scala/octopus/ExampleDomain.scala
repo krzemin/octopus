@@ -18,27 +18,34 @@ object ExampleDomain {
   case class Email(address: String) extends AnyVal
 
   object Email {
-
     val Err_MustNotBeEmpty = "must not be empty"
     val Err_MustContainAt = "must contain @"
     val Err_MustContainDotAfterAt = "must contain . after @"
 
     implicit val validator: Validator[Email] = Validator[Email]
-      .rule(_.address.nonEmpty, Err_MustNotBeEmpty)
-      .rule(_.address.contains("@"), Err_MustContainAt)
-      .rule(_.address.split('@').last.contains("."), Err_MustContainDotAfterAt)
+      .ruleVC[String](_.nonEmpty, Err_MustNotBeEmpty)
+      .ruleVC[String](_.contains("@"), Err_MustContainAt)
+      .ruleVC[String](_.split('@').last.contains("."), Err_MustContainDotAfterAt)
   }
 
-  case class PostalCode(code: String) extends AnyVal
+  import shapeless.tag
+  import shapeless.tag._
+  sealed trait PostalCodeTag
+  type PostalCode = String @@ PostalCodeTag
 
   object PostalCode {
+    def apply(email: String): PostalCode = tag[PostalCodeTag][String](email)
 
     val Err_MustBeLengthOf5 = "must be of length 5"
     val Err_MustContainOnlyDigits = "must contain only digits"
 
+  }
+
+  object PostalCodeTag {
+    import PostalCode._
     implicit val validator: Validator[PostalCode] = Validator[PostalCode]
-      .ruleVC((_: String).length == 5, Err_MustBeLengthOf5)
-      .ruleVC((_: String).forall(_.isDigit), Err_MustContainOnlyDigits)
+      .rule(_.length == 5, Err_MustBeLengthOf5)
+      .rule(_.forall(_.isDigit), Err_MustContainOnlyDigits)
   }
 
   case class Address(street: String,
