@@ -32,7 +32,7 @@ lazy val octopusJS = octopus.js
 lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
   scalacOptions := commonScalacOptions
 )
 
