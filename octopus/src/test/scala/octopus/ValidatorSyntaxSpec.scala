@@ -1,6 +1,7 @@
 package octopus
 
-import octopus.ExampleDomain._
+import octopus.example.domain._
+import octopus.dsl._
 import octopus.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
 import shapeless.tag.@@

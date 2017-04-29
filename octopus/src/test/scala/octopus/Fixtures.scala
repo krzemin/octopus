@@ -1,6 +1,6 @@
 package octopus
 
-import ExampleDomain._
+import octopus.example.domain._
 
 trait Fixtures {
 
