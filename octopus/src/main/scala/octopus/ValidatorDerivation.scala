@@ -45,7 +45,10 @@ trait LowPriorityValidatorDerivation {
     (hlist: FieldType[L, H] :: T) =>
       hv.value.validate(hlist.head).map(FieldLabel(label.value) :: _) ++ tv.validate(hlist.tail)
 
-  implicit val cnilValidator: Validator[CNil] = (_: CNil) => null
+  // $COVERAGE-OFF$
+  implicit val cnilValidator: Validator[CNil] =
+    (_: CNil) => null
+  // $COVERAGE-ON$
 
   implicit def coproductValidator[L <: Symbol, H, T <: Coproduct](implicit hv: Lazy[Validator[H]],
                                                                   tv: Validator[T]): Validator[FieldType[L, H] :+: T] = {
