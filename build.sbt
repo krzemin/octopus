@@ -2,8 +2,8 @@
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
-  .aggregate(octopusJVM, octopusJS)
-  .dependsOn(octopusJVM, octopusJS)
+  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS)
+  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS)
 
 lazy val versions = new {
   val shapeless = "2.3.2"
@@ -28,6 +28,23 @@ lazy val octopusJVM = octopus.jvm
 
 lazy val octopusJS = octopus.js
 
+lazy val octopusCats = crossProject.crossType(CrossType.Pure)
+  .settings(
+    moduleName := "octopus-cats", name := "octopus-cats",
+    description := "Cats integration for Octopus validation library"
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(dependencies: _*)
+  .settings(
+    libraryDependencies += "org.typelevel" %%% "cats-core" % "0.9.0" % "test,provided"
+  )
+  .dependsOn(octopus % "compile->compile;test->test")
+
+
+lazy val octopusCatsJVM = octopusCats.jvm
+
+lazy val octopusCatsJS = octopusCats.js
 
 lazy val coreSettings = commonSettings ++ publishSettings
 
