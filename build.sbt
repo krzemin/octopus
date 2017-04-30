@@ -2,8 +2,8 @@
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
-  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS)
-  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS)
+  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
+  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
   val shapeless = "2.3.2"
@@ -45,6 +45,25 @@ lazy val octopusCats = crossProject.crossType(CrossType.Pure)
 lazy val octopusCatsJVM = octopusCats.jvm
 
 lazy val octopusCatsJS = octopusCats.js
+
+lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
+  .settings(
+    moduleName := "octopus-scalaz", name := "octopus-scalaz",
+    description := "Scalaz integration for Octopus validation library"
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(dependencies: _*)
+  .settings(
+    libraryDependencies += "org.scalaz" %%% "scalaz-core" % "7.2.12" % "test,provided"
+  )
+  .dependsOn(octopus % "compile->compile;test->test")
+
+
+lazy val octopusScalazJVM = octopusScalaz.jvm
+
+lazy val octopusScalazJS = octopusScalaz.js
+
 
 lazy val coreSettings = commonSettings ++ publishSettings
 
