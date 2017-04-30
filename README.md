@@ -10,7 +10,7 @@ Octopus is a Scala library for boilerplate-free validation.
 It defines `Validator[T]` type-class, provide composable DSL for
 defining validation rules for user-defined type and can automatically
 derive validators for case classes, tuples, sealed hierarchies and various
-stadard Scala types by composing other defined or derived validators.
+standard Scala types by composing other defined or derived validators.
 
 ### Example
 
@@ -99,32 +99,60 @@ Octopus is currently available for Scala 2.12 and Scala.js.
 To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %% "octopus" % "0.1.1"
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.2.0"
 ```
 
 Or if you are using Scala.js:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.1.1"
+libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.2.0"
 ```
 
+### Integration with Cats / Scalaz
 
-## Usage
+There are available additional modules that simplify integration with
+Cats and Scalaz validation types.
 
-See [USAGE.md](USAGE.md)
+#### Cats
 
-## Design details
+If you want to integrate with Cats, simply add following line to `build.sbt`:
 
-See [DESIGN.md](DESIGN.md)
+```scala
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.2.0"
+```
+
+Having this dependency on classpath, you can use 
+
+```scala
+import octopus.syntax._
+import octopus.cats._
+
+user1.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Valid(user1)
+
+user2.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Invalid(NonEmptyList(...))
+```
+
+See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusCats/src/test/scala/octopus/cats/CatsIntegrationSpec.scala)
+for more information.
+
+
+#### Scalaz
+
+Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
+
+```scala
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.2.0"
+```
+
+See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
+for reference.
+
 
 ## TODO
 
 Things to implement/consider:
 
-* [ ] abstraction over error message types
 * [ ] asynchronous validations
-* [ ] write about usage
-* [ ] write about design details
 
 ## FAQ
 
