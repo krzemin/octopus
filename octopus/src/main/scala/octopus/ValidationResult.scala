@@ -4,7 +4,7 @@ import shapeless.tag
 import shapeless.tag.@@
 
 
-sealed class ValidationResult[T](private val value: T, val errors: List[ValidationError]) {
+sealed class ValidationResult[T](private[octopus] val value: T, val errors: List[ValidationError]) {
 
   /**
     * Eager validation composition
