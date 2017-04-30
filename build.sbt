@@ -7,7 +7,7 @@ lazy val root = project.in(file("."))
 
 lazy val versions = new {
   val shapeless = "2.3.2"
-  val scalatest = "3.0.1"
+  val scalatest = "3.0.3"
 }
 
 lazy val dependencies = Seq(
