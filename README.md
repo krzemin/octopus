@@ -37,7 +37,7 @@ Let's define validation rules as implicit type class instances.
 // Usually you want to put them into companion objects
 // or group them together in a module.
 
-import octopus._
+import octopus.dsl._
 
 implicit val userIdValidator: Validator[UserId] = Validator[UserId]
   .rule(_.id > 0, "must be positive number")

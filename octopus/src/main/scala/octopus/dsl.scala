@@ -8,6 +8,9 @@ import scala.util.Try
 
 object dsl {
 
+  type Validator[T] = octopus.Validator[T]
+  val Validator = octopus.Validator
+
   implicit class ValidatorOps[T](val v: Validator[T]) extends AnyVal {
 
     def compose(v2: Validator[T]): Validator[T] =
