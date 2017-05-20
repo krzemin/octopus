@@ -7,13 +7,14 @@ trait Fixtures {
   val userId_Valid = UserId(1)
   val userId_Invalid = UserId(0)
 
-  val email_Valid = Email("abc@example.com")
+  val email_Valid = Email("x@y.com")
+  val email_Valid_Long = Email("abc@example.com")
   val email_Invalid1 = Email("")
   val email_Invalid2 = Email("abc")
   val email_Invalid3 = Email("abc@xyz")
   val email_Invalid4 = Email("abc.xyz")
 
-  val postalCode_Valid = PostalCode("00385")
+  val postalCode_Valid = PostalCode("33333")
   val postalCode_Invalid1 = PostalCode("abc")
   val postalCode_Invalid2 = PostalCode("003850")
 

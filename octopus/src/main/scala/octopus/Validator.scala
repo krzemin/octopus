@@ -39,7 +39,9 @@ object Validator extends ValidatorDerivation {
       .validate(sel(gen.to(obj)))
       .map(FieldLabel(field.value) :: _)
 
-  private[octopus] def ruleCatchOnly[T, E <: Throwable : ClassTag](pred: T => Boolean, whenInvalid: String, whenCaught: E => String): Validator[T] =
+  private[octopus] def ruleCatchOnly[T, E <: Throwable : ClassTag](pred: T => Boolean,
+                                                                   whenInvalid: String,
+                                                                   whenCaught: E => String): Validator[T] =
     (obj: T) => try {
       rule(pred, whenInvalid).validate(obj)
     } catch {
@@ -47,7 +49,9 @@ object Validator extends ValidatorDerivation {
         List(ValidationError(whenCaught(ex.asInstanceOf[E])))
     }
 
-  private[octopus] def ruleCatchNonFatal[T](pred: T => Boolean, whenInvalid: String, whenCaught: Throwable => String): Validator[T] =
+  private[octopus] def ruleCatchNonFatal[T](pred: T => Boolean,
+                                            whenInvalid: String,
+                                            whenCaught: Throwable => String): Validator[T] =
     (obj: T) => try {
       rule(pred, whenInvalid).validate(obj)
     } catch {
@@ -55,21 +59,26 @@ object Validator extends ValidatorDerivation {
         List(ValidationError(whenCaught(ex)))
     }
 
-  private[octopus] def ruleTry[T](pred: T => Try[Boolean], whenInvalid: String, whenFailure: Throwable => String): Validator[T] =
+  private[octopus] def ruleTry[T](pred: T => Try[Boolean],
+                                  whenInvalid: String,
+                                  whenFailure: Throwable => String): Validator[T] =
     (obj: T) => pred(obj) match {
       case Success(true) => Nil
       case Success(false) => List(ValidationError(whenInvalid))
       case Failure(why) => List(ValidationError(whenFailure(why)))
     }
 
-  private[octopus] def ruleEither[T](pred: T => Either[String, Boolean], whenInvalid: String): Validator[T] =
+  private[octopus] def ruleEither[T](pred: T => Either[String, Boolean],
+                                     whenInvalid: String): Validator[T] =
     (obj: T) => pred(obj) match {
       case Right(true) => Nil
       case Right(false) => List(ValidationError(whenInvalid))
       case Left(why) => List(ValidationError(why))
     }
 
-  private[octopus] def ruleOption[T](pred: T => Option[Boolean], whenInvalid: String, whenNone: String): Validator[T] =
+  private[octopus] def ruleOption[T](pred: T => Option[Boolean],
+                                     whenInvalid: String,
+                                     whenNone: String): Validator[T] =
     (obj: T) => pred(obj) match {
       case Some(true) => Nil
       case Some(false) => List(ValidationError(whenInvalid))
