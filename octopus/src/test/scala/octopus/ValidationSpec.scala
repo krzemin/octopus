@@ -352,6 +352,24 @@ class ValidationSpec
         )
       }
     }
+
+    "given comap" should {
+
+      "validate lifted type" in {
+        case class Lifted(value: String)
+        val unlift: Lifted => String = _.value
+
+        val validator = Validator[String].rule(!_.isEmpty, "empty")
+
+        implicit val validator2 = validator.comap(unlift)
+
+        Lifted("non-empty").isValid mustBe true
+        Lifted("non-empty").validate mustBe Nil
+
+        Lifted("").isValid mustBe false
+        Lifted("").validate mustBe List(ValidationError("empty"))
+      }
+    }
   }
 
 }
