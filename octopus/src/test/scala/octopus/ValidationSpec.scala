@@ -364,10 +364,10 @@ class ValidationSpec
         implicit val validator2 = validator.comap(unlift)
 
         Lifted("non-empty").isValid mustBe true
-        Lifted("non-empty").validate mustBe Nil
+        Lifted("non-empty").validate.errors mustBe Nil
 
         Lifted("").isValid mustBe false
-        Lifted("").validate mustBe List(ValidationError("empty"))
+        Lifted("").validate.errors mustBe List(ValidationError("empty"))
       }
     }
   }
