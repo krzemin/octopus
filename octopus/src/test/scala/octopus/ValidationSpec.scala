@@ -352,6 +352,82 @@ class ValidationSpec
         )
       }
     }
+
+    "support case classes over 22 parameters" should {
+
+      "pass in success case" in {
+        val goodBigCaseClass = BigCaseClass(
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid
+        )
+
+        goodBigCaseClass.isValid mustBe true
+      }
+
+      "report errors in failure case" in {
+        val badBigCaseClass = BigCaseClass(
+          user_Invalid1,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Valid,
+          user_Invalid2
+        )
+
+        badBigCaseClass.validate.toFieldErrMapping mustBe List(
+          "user1.id" -> UserId.Err_MustBePositive,
+          "user1.email" -> Email.Err_MustContainAt,
+          "user1.email" -> Email.Err_MustContainDotAfterAt,
+          "user1.address.postalCode" -> PostalCode.Err_MustBeLengthOf5,
+          "user1.address.postalCode" -> PostalCode.Err_MustContainOnlyDigits,
+          "user1.address.city" -> Address.Err_MustNotBeEmpty,
+          "user1.address.street" -> Address.Err_MustNotBeEmpty,
+          "user25.id" -> UserId.Err_MustBePositive
+        )
+      }
+    }
   }
 
 }
