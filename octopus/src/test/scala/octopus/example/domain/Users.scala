@@ -33,6 +33,7 @@ sealed trait PostalCodeTag
 
 object PostalCode {
   type T = String @@ PostalCodeTag
+
   def apply(email: String): T = tag[PostalCodeTag][String](email)
 
   val Err_MustBeLengthOf5 = "must be of length 5"
@@ -41,7 +42,9 @@ object PostalCode {
 }
 
 object PostalCodeTag {
+
   import PostalCode._
+
   implicit val validator = Validator[PostalCode.T]
     .rule(_.length == 5, Err_MustBeLengthOf5)
     .rule(_.forall(_.isDigit), Err_MustContainOnlyDigits)
@@ -64,3 +67,29 @@ object Address {
 case class User(id: UserId,
                 email: Email,
                 address: Address)
+
+case class BigCaseClass(user1: User,
+                        user2: User,
+                        user3: User,
+                        user4: User,
+                        user5: User,
+                        user6: User,
+                        user7: User,
+                        user8: User,
+                        user9: User,
+                        user10: User,
+                        user11: User,
+                        user12: User,
+                        user13: User,
+                        user14: User,
+                        user15: User,
+                        user16: User,
+                        user17: User,
+                        user18: User,
+                        user19: User,
+                        user20: User,
+                        user21: User,
+                        user22: User,
+                        user23: User,
+                        user24: User,
+                        user25: User)
