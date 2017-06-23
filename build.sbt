@@ -6,12 +6,14 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
+  val scala = "2.12.2"
   val shapeless = "2.3.2"
   val scalatest = "3.0.3"
 }
 
 lazy val dependencies = Seq(
   libraryDependencies += "com.chuusai" %%% "shapeless" % versions.shapeless,
+  libraryDependencies += "org.scala-lang" % "scala-reflect" % versions.scala,
   libraryDependencies += "org.scalatest" %%% "scalatest" % versions.scalatest % "test"
 )
 
@@ -68,7 +70,7 @@ lazy val octopusScalazJS = octopusScalaz.js
 lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.2",
+  scalaVersion := versions.scala,
   scalacOptions := commonScalacOptions
 )
 
