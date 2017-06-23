@@ -14,6 +14,12 @@ class AsyncValidationSpec
   val uniquenessServiceStub = new UniquenessService {
     def isEmailTaken(email: String): Future[Boolean] =
       Future.successful(email.length <= 10)
+    def doesDomainExists(email: String): Future[Boolean] = {
+      Future.successful {
+        val domain = email.dropWhile(_ != '@').tail
+        Set("y.com", "example.com").contains(domain)
+      }
+    }
   }
 
   val geoServiceStub = new GeoService {

@@ -77,6 +77,10 @@ object dsl {
       def rule(asyncPred: T => Future[Boolean], whenInvalid: String): AsyncValidator[T] =
         compose(AsyncValidator.rule(asyncPred, whenInvalid))
 
+      def rule[F](selector: T => F, pred: F => Future[Boolean], whenInvalid: String): AsyncValidator[T] =
+        macro DslMacros.ruleFieldSelectorAsync[T, F]
+
+
       def ruleVC[V](asyncPred: V => Future[Boolean], whenInvalid: String)
                    (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[T] =
         compose(AsyncValidator.ruleVC(asyncPred, whenInvalid))
