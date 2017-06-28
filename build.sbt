@@ -57,7 +57,7 @@ lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
   .settings(publishSettings: _*)
   .settings(dependencies: _*)
   .settings(
-    libraryDependencies += "org.scalaz" %%% "scalaz-core" % "7.2.12" % "test,provided"
+    libraryDependencies += "org.scalaz" %%% "scalaz-core" % "7.2.14" % "test,provided"
   )
   .dependsOn(octopus % "compile->compile;test->test")
 
