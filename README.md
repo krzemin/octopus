@@ -108,6 +108,59 @@ Or if you are using Scala.js:
 libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.2.0"
 ```
 
+### Asynchronous validators
+
+Sometimes validation rules are more complex in sense that they can't be decided
+locally by only looking at object value, but they require some external context
+like querying service or database. Therefore, Octopus has support for asynchronous
+predicates, that instead of `T => Boolean`, are defined in terms of `T => Future[Boolean]`.
+The same as with normal validation predicates, full derivation is also supported for
+asynchronous validators. Look at the example below to get better insight:
+
+```scala
+trait EmailService {
+  def isEmailTaken(email: String): Future[Boolean]
+  def doesDomainExists(email: String): Future[Boolean]
+}
+
+class AsyncValidators(emailService: EmailService) {
+
+  implicit val emailAsyncValidator: AsyncValidator[Email] =
+    Validator
+      .derived[Email] // (1)
+      .async.ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
+      .async.rule(_.address, emailService.doesDomainExists, "domain does not exists") // (3)
+}
+
+val asyncValidators = new AsyncValidators(...)
+
+import asyncValidators._ // (4)
+
+Email("abc@xyz.qux").isValidAsync // Success(false): Future[Boolean]
+Email("abc@xyzqux").validateAsync
+  .map(_.toFieldErrMapping)
+  // Success(List(("", "must contain . after @"), ("", "domain does not exists"))): Future[List[(String, String)]
+
+
+val user1 = User(
+  UserId(1),
+  Email("taken@example.com"),
+  Address("Love Street", PostalCode("12345"), "Los Angeles")
+)
+
+user1.validateAsync
+  .map(_.toFieldErrMapping) // Success(List("email", "email is already taken by someone else")): Future[List[(String, String)]
+```
+
+Comments:
+
+* (1) we are requesting to derive usual validator for `Email` type
+* (2) by using prepending rule with `async` keyword we can define validator rule with
+  asynchronous predicate that lifts our validator to `AsyncValidator[Email]`
+* (3) we are adding next asynchronous validation rule
+* (4) we are importing instances for asynchronous validators into current scope
+
+
 ### Integration with Cats / Scalaz
 
 There are available additional modules that simplify integration with
@@ -148,12 +201,6 @@ See [integration test suite](https://github.com/krzemin/octopus/blob/master/octo
 for reference.
 
 
-## TODO
-
-Things to implement/consider:
-
-* [ ] asynchronous validations
-
 ## FAQ
 
 #### How it's different that Cats/Scalaz validation data types?
@@ -191,7 +238,7 @@ them in another layer of your application.
 
 ## License
 
-Copyright 2016 Piotr Krzemiński
+Copyright 2016-2017 Piotr Krzemiński
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

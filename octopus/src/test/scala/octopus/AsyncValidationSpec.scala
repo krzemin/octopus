@@ -11,7 +11,7 @@ class AsyncValidationSpec
   extends AsyncWordSpec with Fixtures
     with ScalaFutures with IntegrationPatience {
 
-  val uniquenessServiceStub = new UniquenessService {
+  val emailServiceStub = new EmailService {
     def isEmailTaken(email: String): Future[Boolean] =
       Future.successful(email.length <= 10)
     def doesDomainExists(email: String): Future[Boolean] = {
@@ -27,7 +27,7 @@ class AsyncValidationSpec
       Future.successful(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
   }
 
-  val asyncValidators = new AsyncValidators(uniquenessServiceStub, geoServiceStub)
+  val asyncValidators = new AsyncValidators(emailServiceStub, geoServiceStub)
 
   "AsyncValidation" when {
 
