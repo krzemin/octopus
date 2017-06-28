@@ -155,7 +155,7 @@ user1.validateAsync
 Comments:
 
 * (1) we are requesting to derive usual validator for `Email` type
-* (2) by using prepending rule with `async` keyword we can define validator rule with
+* (2) by prepending rule with `async` keyword we can define validator rule with
   asynchronous predicate that lifts our validator to `AsyncValidator[Email]`
 * (3) we are adding next asynchronous validation rule
 * (4) we are importing instances for asynchronous validators into current scope
