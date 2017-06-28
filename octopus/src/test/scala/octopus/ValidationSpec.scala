@@ -357,11 +357,10 @@ class ValidationSpec
 
       "validate lifted type" in {
         case class Lifted(value: String)
-        val unlift: Lifted => String = _.value
 
-        val validator = Validator[String].rule(!_.isEmpty, "empty")
-
-        implicit val validator2 = validator.comap(unlift)
+        implicit val validator = Validator[String]
+          .rule(!_.isEmpty, "empty")
+          .comap[Lifted](_.value)
 
         Lifted("non-empty").isValid mustBe true
         Lifted("non-empty").validate.errors mustBe Nil

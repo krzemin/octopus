@@ -10,8 +10,6 @@ import scala.util.control.NonFatal
 trait Validator[T] {
 
   def validate(obj: T): List[ValidationError]
-
-  def comap[U](f: U => T): Validator[U] = (value: U) => validate(f(value))
 }
 
 object Validator extends ValidatorDerivation {

@@ -21,6 +21,9 @@ object dsl {
     def compose(v2: Validator[T]): Validator[T] =
       (obj: T) => v.validate(obj) ++ v2.validate(obj)
 
+    def comap[U](f: U => T): Validator[U] =
+      (value: U) => v.validate(f(value))
+
     def rule(pred: T => Boolean, whenInvalid: String): Validator[T] =
       compose(Validator.rule(pred, whenInvalid))
 
@@ -69,6 +72,12 @@ object dsl {
           .map { case (e1, e2) => e1 ++ e2 }(ec)
       }
 
+    def comap[U](f: U => T): AsyncValidator[U] =
+      AsyncValidator.instance[U] {
+        (value: U, ec: ExecutionContext) =>
+          v.validate(f(value))(ec)
+      }
+
     def rule(asyncPred: T => Future[Boolean], whenInvalid: String): AsyncValidator[T] =
       compose(AsyncValidator.rule(asyncPred, whenInvalid))
 
@@ -115,6 +124,12 @@ object dsl {
       AsyncValidator.instance { (obj: T, ec: ExecutionContext) =>
         v.validate(obj)(ec)
           .map(_ ++ v2.validate(obj))(ec)
+      }
+
+    def comap[U](f: U => T): AsyncValidator[U] =
+      AsyncValidator.instance[U] {
+        (value: U, ec: ExecutionContext) =>
+          v.validate(f(value))(ec)
       }
 
     def rule(pred: T => Boolean, whenInvalid: String): AsyncValidator[T] =
