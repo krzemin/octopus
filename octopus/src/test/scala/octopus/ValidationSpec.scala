@@ -353,6 +353,24 @@ class ValidationSpec
       }
     }
 
+    "given comap" should {
+
+      "validate lifted type" in {
+        case class Lifted(value: String)
+        val unlift: Lifted => String = _.value
+
+        val validator = Validator[String].rule(!_.isEmpty, "empty")
+
+        implicit val validator2 = validator.comap(unlift)
+
+        Lifted("non-empty").isValid mustBe true
+        Lifted("non-empty").validate.errors mustBe Nil
+
+        Lifted("").isValid mustBe false
+        Lifted("").validate.errors mustBe List(ValidationError("empty"))
+      }
+    }
+
     "support case classes over 22 parameters" should {
 
       "pass in success case" in {
