@@ -1,7 +1,7 @@
 package octopus
 
 import octopus.example.domain._
-import octopus.syntax.async._
+import octopus.syntax._
 import org.scalatest.AsyncWordSpec
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 

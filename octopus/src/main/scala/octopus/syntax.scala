@@ -13,19 +13,17 @@ object syntax {
       validate.isValid
   }
 
-  object async {
+  implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
 
-    implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
+    def validateAsync(implicit av: AsyncValidator[T],
+                      ec: ExecutionContext): Future[ValidationResult[T]] =
+      av.validate(obj)(ec).map { errors =>
+        new ValidationResult(obj, errors)
+      }
 
-      def validateAsync(implicit av: AsyncValidator[T],
-                        ec: ExecutionContext): Future[ValidationResult[T]] =
-        av.validate(obj)(ec).map { errors =>
-          new ValidationResult(obj, errors)
-        }
-
-      def isValidAsync(implicit av: AsyncValidator[T],
-                       ec: ExecutionContext): Future[Boolean] =
-        validateAsync.map(_.isValid)
-    }
+    def isValidAsync(implicit av: AsyncValidator[T],
+                     ec: ExecutionContext): Future[Boolean] =
+      validateAsync.map(_.isValid)
   }
+
 }

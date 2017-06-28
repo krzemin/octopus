@@ -1,7 +1,6 @@
 package octopus.example.domain
 
 import octopus.dsl._
-import octopus.dsl.async._
 
 import scala.concurrent.Future
 
@@ -25,9 +24,9 @@ class AsyncValidators(uniquenessService: UniquenessService,
   implicit val emailAsyncValidator: AsyncValidator[Email] =
     Validator
       .derived[Email]
-      .toAsync
       .async.ruleVC(uniquenessService.isEmailTaken, Email_Err_AlreadyTaken)
       .async.rule(_.address, uniquenessService.doesDomainExists, Email_Err_DomainDoesNotExists)
+      .rule(_.address, (_: String).nonEmpty, Email.Err_MustNotBeEmpty) // repeated to check dsl behavior
 
   val PostalCode_Err_DoesNotExist = "postal code does not exist"
 
