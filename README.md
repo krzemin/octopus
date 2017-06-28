@@ -159,6 +159,7 @@ Comments:
   asynchronous predicate that lifts our validator to `AsyncValidator[Email]`
 * (3) we are adding next asynchronous validation rule
 * (4) we are importing instances for asynchronous validators into current scope
+  so that later we can use `.isValidAsync`/`.validateAsync` extension methods.
 
 
 ### Integration with Cats / Scalaz
