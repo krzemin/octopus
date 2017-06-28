@@ -172,7 +172,7 @@ Cats and Scalaz validation types.
 If you want to integrate with Cats, simply add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.2.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.0"
 ```
 
 Having this dependency on classpath, you can use 
@@ -195,7 +195,7 @@ for more information.
 Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.2.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.0"
 ```
 
 See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
