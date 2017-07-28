@@ -1,4 +1,3 @@
-
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
@@ -6,7 +5,7 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
-  val scala = "2.12.2"
+  val scala = "2.12.3"
   val shapeless = "2.3.2"
   val scalatest = "3.0.3"
 }
@@ -19,7 +18,8 @@ lazy val dependencies = Seq(
 
 lazy val octopus = crossProject.crossType(CrossType.Pure)
   .settings(
-    moduleName := "octopus", name := "octopus",
+    moduleName := "octopus",
+    name := "octopus",
     description := "Boilerplate-free validation library for Scala"
   )
   .settings(commonSettings: _*)
@@ -27,7 +27,6 @@ lazy val octopus = crossProject.crossType(CrossType.Pure)
   .settings(dependencies: _*)
 
 lazy val octopusJVM = octopus.jvm
-
 lazy val octopusJS = octopus.js
 
 lazy val octopusCats = crossProject.crossType(CrossType.Pure)
@@ -45,7 +44,6 @@ lazy val octopusCats = crossProject.crossType(CrossType.Pure)
 
 
 lazy val octopusCatsJVM = octopusCats.jvm
-
 lazy val octopusCatsJS = octopusCats.js
 
 lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
@@ -63,7 +61,6 @@ lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
 
 
 lazy val octopusScalazJVM = octopusScalaz.jvm
-
 lazy val octopusScalazJS = octopusScalaz.js
 
 
