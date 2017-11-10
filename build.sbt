@@ -7,7 +7,9 @@ lazy val root = project.in(file("."))
 lazy val versions = new {
   val scala = "2.12.3"
   val shapeless = "2.3.2"
-  val scalatest = "3.0.3"
+  val scalatest = "3.0.4"
+  val cats = "0.9.0"
+  val scalaz = "7.2.16"
 }
 
 lazy val dependencies = Seq(
@@ -38,7 +40,7 @@ lazy val octopusCats = crossProject.crossType(CrossType.Pure)
   .settings(publishSettings: _*)
   .settings(dependencies: _*)
   .settings(
-    libraryDependencies += "org.typelevel" %%% "cats-core" % "0.9.0" % "test,provided"
+    libraryDependencies += "org.typelevel" %%% "cats-core" % versions.cats % "test,provided"
   )
   .dependsOn(octopus % "compile->compile;test->test")
 
@@ -55,7 +57,7 @@ lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
   .settings(publishSettings: _*)
   .settings(dependencies: _*)
   .settings(
-    libraryDependencies += "org.scalaz" %%% "scalaz-core" % "7.2.14" % "test,provided"
+    libraryDependencies += "org.scalaz" %%% "scalaz-core" % versions.scalaz % "test,provided"
   )
   .dependsOn(octopus % "compile->compile;test->test")
 
