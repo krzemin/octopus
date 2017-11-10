@@ -14,7 +14,7 @@ lazy val versions = new {
 
 lazy val dependencies = Seq(
   libraryDependencies += "com.chuusai" %%% "shapeless" % versions.shapeless,
-  libraryDependencies += "org.scala-lang" % "scala-reflect" % versions.scala,
+  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   libraryDependencies += "org.scalatest" %%% "scalatest" % versions.scalatest % "test"
 )
 
@@ -71,7 +71,7 @@ lazy val coreSettings = commonSettings ++ publishSettings
 lazy val commonSettings = Seq(
   scalaVersion := versions.scala,
   scalacOptions := commonScalacOptions
-)
+) ++ lintUnused
 
 lazy val commonScalacOptions = Seq(
   "-deprecation",
@@ -81,12 +81,17 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
-  "-Xlint:-unused",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Xfuture"
+)
+
+lazy val lintUnused = Seq(
+  scalacOptions ++= {
+    if (scalaVersion.value == "2.12.1") Seq() else Seq("-Xlint:-unused")
+  }
 )
 
 lazy val publishSettings = Seq(
