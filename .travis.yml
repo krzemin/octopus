@@ -1,10 +1,11 @@
 language: scala
 scala:
-#  2.12.0 not fully supported, most likely due to SI-7046
+#  2.12.0 not fully supported, most due to SI-7046 related issues
 #   - 2.12.0
    - 2.12.1
    - 2.12.2
    - 2.12.3
+   - 2.12.4
 jdk:
   - oraclejdk8
 
