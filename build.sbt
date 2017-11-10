@@ -5,7 +5,7 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
-  val scala = "2.12.3"
+  val scala = "2.12.4"
   val shapeless = "2.3.2"
   val scalatest = "3.0.4"
   val cats = "0.9.0"
@@ -81,6 +81,7 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
+  "-Xlint:-unused",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",

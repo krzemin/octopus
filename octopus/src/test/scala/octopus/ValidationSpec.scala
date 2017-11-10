@@ -259,7 +259,7 @@ class ValidationSpec
 
       "validate using 'ruleCatchOnly'" in {
 
-        implicit val validator = PositiveInputNumber.validatorCatchOnly
+        implicit val validator: Validator[PositiveInputNumber] = PositiveInputNumber.validatorCatchOnly
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -276,7 +276,7 @@ class ValidationSpec
 
       "validate using 'ruleCatchNonFatal'" in {
 
-        implicit val validator = PositiveInputNumber.validatorCatchNonFatal
+        implicit val validator: Validator[PositiveInputNumber] = PositiveInputNumber.validatorCatchNonFatal
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -297,7 +297,7 @@ class ValidationSpec
     "given validators from various standard scala types" should {
 
       "validate using 'ruleTry'" in {
-        implicit val validator = PositiveInputNumber.validatorTry
+        implicit val validator: Validator[PositiveInputNumber] = PositiveInputNumber.validatorTry
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -316,7 +316,7 @@ class ValidationSpec
 
       "validate using 'ruleEither'" in {
 
-        implicit val validator = PositiveInputNumber.validatorEither
+        implicit val validator: Validator[PositiveInputNumber] = PositiveInputNumber.validatorEither
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -335,7 +335,7 @@ class ValidationSpec
 
       "validate using 'ruleOption'" in {
 
-        implicit val validator = PositiveInputNumber.validatorOption
+        implicit val validator: Validator[PositiveInputNumber] = PositiveInputNumber.validatorOption
 
         PositiveInputNumber("3.5").validate.isValid mustBe true
 
@@ -358,7 +358,7 @@ class ValidationSpec
       "validate lifted type" in {
         case class Lifted(value: String)
 
-        implicit val validator = Validator[String]
+        implicit val validator: Validator[Lifted] = Validator[String]
           .rule(!_.isEmpty, "empty")
           .comap[Lifted](_.value)
 
