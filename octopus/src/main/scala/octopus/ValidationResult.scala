@@ -46,7 +46,7 @@ sealed class ValidationResult[T](private[octopus] val value: T, val errors: List
     }
 
   def toTaggedEither[Tag]: Either[List[ValidationError], T @@ Tag] =
-    toEither.map(tag[Tag](_))
+    toEither.right.map(tag[Tag](_))
 
   def toFieldErrMapping: List[(String, String)] =
     errors.map(_.toPair)

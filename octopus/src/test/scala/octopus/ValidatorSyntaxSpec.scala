@@ -59,9 +59,9 @@ class ValidatorSyntaxSpec
 
       def doSomethingWithEmail(email: Email @@ Valid): Unit = ()
 
-      email_Valid.validate.toTaggedEither[Valid].foreach(doSomethingWithEmail)
+      email_Valid.validate.toTaggedEither[Valid].right.foreach(doSomethingWithEmail)
 
-      illTyped("email_Valid.validate.toEither.foreach(doSomethingWithEmail)")
+      illTyped("email_Valid.validate.toEither.right.foreach(doSomethingWithEmail)")
     }
 
     "compose validation with already validated result" should {

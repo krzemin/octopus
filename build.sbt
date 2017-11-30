@@ -6,6 +6,7 @@ lazy val root = project.in(file("."))
 
 lazy val versions = new {
   val scala = "2.12.4"
+  val scala211 = "2.11.12"
   val shapeless = "2.3.2"
   val scalatest = "3.0.4"
   val cats = "0.9.0"
@@ -70,6 +71,7 @@ lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
   scalaVersion := versions.scala,
+  crossScalaVersions := Seq(versions.scala211, versions.scala),
   scalacOptions := commonScalacOptions
 ) ++ lintUnused
 
@@ -85,12 +87,13 @@ lazy val commonScalacOptions = Seq(
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
-  "-Xfuture"
+  "-Xfuture",
+  "-Xexperimental"
 )
 
 lazy val lintUnused = Seq(
   scalacOptions ++= {
-    if (scalaVersion.value == "2.12.1") Seq() else Seq("-Xlint:-unused")
+    if (scalaVersion.value <= "2.12.1") Seq() else Seq("-Xlint:-unused")
   }
 )
 
