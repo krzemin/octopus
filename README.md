@@ -99,13 +99,13 @@ Octopus is currently available for Scala 2.11, 2.12 and Scala.js.
 To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %% "octopus" % "0.3.2"
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.3.3"
 ```
 
 Or if you are using Scala.js:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.3.2"
+libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.3.3"
 ```
 
 ### Asynchronous validators
