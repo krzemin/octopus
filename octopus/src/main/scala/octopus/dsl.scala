@@ -78,6 +78,18 @@ object dsl {
           .map { case (e1, e2) => e1 ++ e2 }(ec)
       }
 
+    def composeSuper[U >: T](v2: AsyncValidator[U]): AsyncValidator[T] =
+      AsyncValidator.instance { (obj: T, ec: ExecutionContext) =>
+        (v.validate(obj)(ec) zip v2.validate(obj)(ec))
+          .map { case (e1, e2) => e1 ++ e2 }(ec)
+      }
+
+    def composeDerived(implicit dav: DerivedAsyncValidator[T]): AsyncValidator[T] =
+      AsyncValidator.instance { (obj: T, ec: ExecutionContext) =>
+        (v.validate(obj)(ec) zip dav.av.validate(obj)(ec))
+          .map { case (e1, e2) => e1 ++ e2 }(ec)
+      }
+
     def comap[U](f: U => T): AsyncValidator[U] =
       AsyncValidator.instance[U] {
         (value: U, ec: ExecutionContext) =>
@@ -132,6 +144,18 @@ object dsl {
           .map(_ ++ v2.validate(obj))(ec)
       }
 
+    def composeSuper[U >: T](v2: Validator[U]): AsyncValidator[T] =
+      AsyncValidator.instance { (obj: T, ec: ExecutionContext) =>
+        v.validate(obj)(ec)
+          .map(_ ++ v2.validate(obj))(ec)
+      }
+
+    def composeDerived(implicit dav: DerivedValidator[T]): AsyncValidator[T] =
+      AsyncValidator.instance { (obj: T, ec: ExecutionContext) =>
+        v.validate(obj)(ec)
+          .map(_ ++ dav.v.validate(obj))(ec)
+      }
+
     def comap[U](f: U => T): AsyncValidator[U] =
       AsyncValidator.instance[U] {
         (value: U, ec: ExecutionContext) =>
@@ -173,6 +197,4 @@ object dsl {
                    whenNone: String): AsyncValidator[T] =
       compose(ValidationRules.ruleOption(pred, whenInvalid, whenNone))
   }
-
-
 }

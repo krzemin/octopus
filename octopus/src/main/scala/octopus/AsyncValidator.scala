@@ -8,7 +8,7 @@ trait AsyncValidator[T] {
               (implicit ec: ExecutionContext): Future[List[ValidationError]]
 }
 
-object AsyncValidator extends AsyncValidatorDerivation {
+object AsyncValidator {
 
   def instance[T](f: (T, ExecutionContext) => Future[List[ValidationError]]): AsyncValidator[T] =
     new AsyncValidator[T] {
@@ -26,4 +26,6 @@ object AsyncValidator extends AsyncValidatorDerivation {
 
   def invalid[T](error: String): AsyncValidator[T] =
     lift(Validator.invalid(error))
+
+  implicit def fromDerivedAsyncValidator[T](implicit dav: DerivedAsyncValidator[T]): AsyncValidator[T] = dav.av
 }
