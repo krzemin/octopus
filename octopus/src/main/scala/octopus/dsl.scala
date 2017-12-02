@@ -24,6 +24,9 @@ object dsl {
     def composeSuper[U >: T](v2: Validator[U]): Validator[T] =
       (obj: T) => v.validate(obj) ++ v2.validate(obj)
 
+    def composeDerived(implicit dv: DerivedValidator[T]): Validator[T] =
+      (obj: T) => v.validate(obj) ++ dv.v.validate(obj)
+
     def comap[U](f: U => T): Validator[U] =
       (value: U) => v.validate(f(value))
 

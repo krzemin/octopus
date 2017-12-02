@@ -11,7 +11,7 @@ object UserId {
 
   val Err_MustBePositive = "must be positive number"
 
-  implicit val validator = Validator[UserId]
+  implicit val validator: Validator[UserId] = Validator[UserId]
     .rule(_.id > 0, Err_MustBePositive)
 }
 
@@ -22,7 +22,7 @@ object Email {
   val Err_MustContainAt = "must contain @"
   val Err_MustContainDotAfterAt = "must contain . after @"
 
-  implicit val validator = Validator[Email]
+  implicit val validator: Validator[Email] = Validator[Email]
     .ruleVC[String](_.nonEmpty, Err_MustNotBeEmpty)
     .ruleVC[String](_.contains("@"), Err_MustContainAt)
     .ruleVC[String](_.split('@').last.contains("."), Err_MustContainDotAfterAt)
@@ -45,7 +45,7 @@ object PostalCodeTag {
 
   import PostalCode._
 
-  implicit val validator = Validator[PostalCode.T]
+  implicit val validator: Validator[PostalCode.T] = Validator[PostalCode.T]
     .rule(_.length == 5, Err_MustBeLengthOf5)
     .rule(_.forall(_.isDigit), Err_MustContainOnlyDigits)
 }
@@ -58,7 +58,7 @@ object Address {
 
   val Err_MustNotBeEmpty = "must not be empty"
 
-  implicit val validator = Validator
+  implicit val validator: Validator[Address] = Validator
     .derived[Address]
     .ruleField('city, (_: String).nonEmpty, Err_MustNotBeEmpty)
     .rule(_.street, (_: String).nonEmpty, Err_MustNotBeEmpty)

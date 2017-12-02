@@ -10,7 +10,7 @@ object Circle {
 
   val Err_RadiusMustBePositive = "radius must be greater than 0"
 
-  implicit val validator = Validator[Circle]
+  implicit val validator: Validator[Circle] = Validator[Circle]
     .rule(_.radius > 0, Err_RadiusMustBePositive)
 }
 
@@ -21,7 +21,7 @@ object Rectangle {
   val Err_WidthMustBePositive = "width must be greater than 0"
   val Err_HeightMustBePositive = "height must be greater than 0"
 
-  implicit val validator = Validator[Rectangle]
+  implicit val validator: Validator[Rectangle] = Validator[Rectangle]
     .rule(_.width > 0, Err_WidthMustBePositive)
     .rule(_.height > 0, Err_HeightMustBePositive)
 }
