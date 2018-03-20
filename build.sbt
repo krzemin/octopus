@@ -5,12 +5,12 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
-  val scala = "2.12.4"
+  val scala = "2.12.5"
   val scala211 = "2.11.12"
-  val shapeless = "2.3.2"
-  val scalatest = "3.0.4"
-  val cats = "0.9.0"
-  val scalaz = "7.2.16"
+  val shapeless = "2.3.3"
+  val scalatest = "3.0.5"
+  val cats = "1.1.0"
+  val scalaz = "7.2.20"
 }
 
 lazy val dependencies = Seq(
