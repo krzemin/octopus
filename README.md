@@ -54,8 +54,8 @@ implicit val potalCodeValidator: Validator[PostalCode] = Validator[PostalCode]
 
 implicit val addressValidator: Validator[Address] = Validator
   .derived[Address] // derives default validator for Address
-  .ruleField('city, (_: String).nonEmpty, "must not be empty")
-  .ruleField('street, (_: String).nonEmpty, "must not be empty")
+  .rule(_.city, (_: String).nonEmpty, "must not be empty")
+  .rule(_.street, (_: String).nonEmpty, "must not be empty")
 ```
 
 Then, having validator instances imported, we can validate
@@ -172,7 +172,7 @@ Cats and Scalaz validation types.
 If you want to integrate with Cats, simply add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.3"
 ```
 
 Having this dependency on classpath, you can use 
@@ -195,7 +195,7 @@ for more information.
 Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.3"
 ```
 
 See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
