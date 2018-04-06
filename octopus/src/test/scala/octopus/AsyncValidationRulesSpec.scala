@@ -28,7 +28,16 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     }
 
     "reject invalid email" in {
+
+      val expectedValidationError = ValidationError(
+        message = Email_does_not_contain_a,
+        path = FieldPath(List(FieldLabel('email)))
+      )
+
       user_Valid.isValidAsync.map(r => r must be (false))
+      user_Valid.validateAsync.map { r =>
+        r.errors must contain (expectedValidationError)
+      }
     }
 
   }
