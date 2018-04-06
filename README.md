@@ -224,19 +224,6 @@ composability:
   automatically by using type-class derivation mechanism; still you can override validation
   rules for certain types in local contexts.
 
-#### What about asynchronous validations?
-
-When defining validators usually we use predicate functions `T => Boolean` to decide
-satisfiability of certain rule. This work work well as long as we can answer this
-question only having access to value being validated.
-
-But sometimes this restriction is too limiting to decide a validation - in some cases
-it's necessary to query some external data source (like database). Thus, we would
-want to have asynchronous predicates like `T => Future[Boolean]`.
-
-Currently Octopus doesn't support asynchronous validations. You can always deal with
-them in another layer of your application.
-
 ## License
 
 Copyright 2016-2017 Piotr Krzemiński
