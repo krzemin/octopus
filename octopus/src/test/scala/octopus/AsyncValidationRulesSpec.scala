@@ -1,5 +1,8 @@
 package octopus
 
+import java.net.ConnectException
+import java.util.concurrent.ExecutionException
+
 import octopus.example.domain.{Email, User}
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -15,30 +18,44 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
   with MustMatchers {
 
   private def isEmailUnique(email: Email): Future[Boolean] = Future.successful(email.address.contains("a"))
+  private def emailCheckThrowing(email: Email): Future[Boolean] = Future.failed(new ConnectException())
   private def Email_does_not_contain_a = "Email does not contain a"
-
-  implicit val userUniqueEmailValidator = Validator[User]
-    .async
-    .ruleField('email, isEmailUnique, Email_does_not_contain_a)
 
   "AsyncValidationRules" when {
 
-    "accept proper email" in {
-      user_Valid2.isValidAsync.map(r => assert(r))
-    }
+    "Simple email validator" should {
 
-    "reject invalid email" in {
+      implicit val userUniqueEmailValidator = Validator[User]
+        .async
+        .ruleField('email, isEmailUnique, Email_does_not_contain_a)
 
-      val expectedValidationError = ValidationError(
-        message = Email_does_not_contain_a,
-        path = FieldPath(List(FieldLabel('email)))
-      )
+      "accept proper email" in {
+        user_Valid2.isValidAsync.map(r => assert(r))
+      }
 
-      user_Valid.isValidAsync.map(r => r must be (false))
-      user_Valid.validateAsync.map { r =>
-        r.errors must contain (expectedValidationError)
+      "reject invalid email" in {
+
+        val expectedValidationError = ValidationError(
+          message = Email_does_not_contain_a,
+          path = FieldPath(List(FieldLabel('email)))
+        )
+
+        user_Valid.isValidAsync.map(r => r must be(false))
+        user_Valid.validateAsync.map { r =>
+          r.errors must contain(expectedValidationError)
+        }
       }
     }
 
+    "Throwing email validator" should {
+
+      implicit val userUniqueThrowingValidator = Validator[User]
+        .async
+        .ruleField('email, emailCheckThrowing, Email_does_not_contain_a)
+
+      "throw on validation check" in {
+        user_Valid.isValidAsync.failed.map(r => r mustBe an [ConnectException])
+      }
+    }
   }
 }
