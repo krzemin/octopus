@@ -19,14 +19,16 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
 
   private def isEmailUnique(email: Email): Future[Boolean] = Future.successful(email.address.contains("a"))
   private def emailCheckThrowing(email: Email): Future[Boolean] = Future.failed(new ConnectException())
-  private def Email_does_not_contain_a = "Email does not contain a"
+  private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_handled_during_validation))
+  private val Email_does_not_contain_a = "Email does not contain a"
+  private val Invalid_user = "Invalid user"
+  private val userValidator = Validator[User].async
 
   "AsyncValidationRules" when {
 
     "Simple email validator" should {
 
-      implicit val userUniqueEmailValidator = Validator[User]
-        .async
+      implicit val userUniqueEmailValidator = userValidator
         .ruleField('email, isEmailUnique, Email_does_not_contain_a)
 
       "accept proper email" in {
@@ -49,8 +51,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
 
     "Throwing email validator" should {
 
-      implicit val userUniqueThrowingValidator = Validator[User]
-        .async
+      implicit val userUniqueThrowingValidator = userValidator
         .ruleField('email, emailCheckThrowing, Email_does_not_contain_a)
 
       "throw on validation check" in {
