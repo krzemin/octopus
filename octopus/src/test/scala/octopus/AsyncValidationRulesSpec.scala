@@ -19,10 +19,17 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
   private def isEmailUnique(email: Email): Future[Boolean] = Future.successful(email.address.contains("a"))
   private def emailCheckThrowing(email: Email): Future[Boolean] = Future.failed(new IOException())
   private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_handled_during_validation))
+  private def validateUserEither(user: User): Future[Either[String, Boolean]] = Future.successful { user.email match {
+    case Email(address) if address == email_Valid.address => Right(true)
+    case Email(address) if address == email_Valid_Long.address => Right(false)
+    case _ => Left(Email_validated_left_case)
+  }}
 
   private val Email_does_not_contain_a = "Email does not contain a"
   private val Invalid_user = "Invalid user"
   private val Exception_handled_during_validation = "Exception handled during validation"
+  private val Email_invalid = "Invalid email"
+  private val Email_validated_left_case = "Invalid email left case"
 
   private val userValidator = Validator[User].async
 
@@ -60,6 +67,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
         user_Valid.isValidAsync.failed.map(r => r mustBe an [IOException])
       }
     }
+
     "Catch non fatal rule" should {
       implicit val userCatchNonFatal = userValidator
         .ruleCatchNonFatal(userThrowNonFatal, Invalid_user, e => e.getMessage)
@@ -73,6 +81,37 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
         user_Valid.isValidAsync.map(r => r must be (false))
         user_Valid.validateAsync.map { r =>
           r.errors must contain (expectedValidationException)
+        }
+      }
+    }
+
+    "Work with all 3 cases of either" should {
+      implicit val validator = userValidator
+        .ruleEither(validateUserEither, Email_invalid)
+
+      "properly validate on Right(true)" in {
+        user_Valid.isValidAsync.map(r => r must be (true))
+      }
+
+      "properly invalidate on Right(false) case" in {
+        val expectedError = ValidationError(
+          message = Email_invalid
+        )
+
+        user_Valid2.isValidAsync.map(r => r must be (false))
+        user_Valid2.validateAsync.map { r =>
+          r.errors must contain (expectedError)
+        }
+      }
+
+      "properly invalidate with message on Left case" in {
+        val expectedError = ValidationError(
+          message = Email_validated_left_case
+        )
+
+        user_Invalid1.isValidAsync.map(r => r must be (false))
+        user_Invalid1.validateAsync.map { r =>
+          r.errors must contain (expectedError)
         }
       }
     }
