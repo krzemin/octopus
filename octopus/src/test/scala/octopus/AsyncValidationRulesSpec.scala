@@ -19,6 +19,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
   private def isEmailUnique(email: Email): Future[Boolean] = Future.successful(email.address.contains("a"))
   private def emailCheckThrowing(email: Email): Future[Boolean] = Future.failed(new IOException())
   private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_handled_during_validation))
+  private def userThrowIOException(user: User): Future[Boolean] = Future.failed(new IOException())
   private def validateUserEither(user: User): Future[Either[String, Boolean]] = Future.successful { user.email match {
     case Email(address) if address == email_Valid.address => Right(true)
     case Email(address) if address == email_Valid_Long.address => Right(false)
@@ -26,7 +27,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
   }}
 
   private val Email_does_not_contain_a = "Email does not contain a"
-  private val Invalid_user = "Invalid user"
+  private val User_Invalid = "Invalid user"
   private val Exception_handled_during_validation = "Exception handled during validation"
   private val Email_invalid = "Invalid email"
   private val Email_validated_left_case = "Invalid email left case"
@@ -70,7 +71,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
 
     "Catch non fatal rule" should {
       implicit val userCatchNonFatal = userValidator
-        .ruleCatchNonFatal(userThrowNonFatal, Invalid_user, e => e.getMessage)
+        .ruleCatchNonFatal(userThrowNonFatal, User_Invalid, e => e.getMessage)
 
       "fail validation with exception in errors" in {
 
