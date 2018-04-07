@@ -25,12 +25,18 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     case Email(address) if address == email_Valid_Long.address => Right(false)
     case _ => Left(Email_validated_left_case)
   }}
+  private def validateUserOption(user: User): Future[Option[Boolean]] = Future.successful { user.email match {
+    case Email(address) if address == email_Valid.address => Some(true)
+    case Email(address) if address == email_Valid_Long.address => Some(false)
+    case _ => None
+  }}
 
   private val Email_does_not_contain_a = "Email does not contain a"
   private val User_Invalid = "Invalid user"
   private val Exception_handled_during_validation = "Exception handled during validation"
   private val Email_invalid = "Invalid email"
   private val Email_validated_left_case = "Invalid email left case"
+  private val User_validated_none_option = "Invalid user none option"
 
   private val userValidator = Validator[User].async
 
@@ -133,5 +139,34 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
         }
       }
     }
+     "Work with all 3 cases of option" should {
+
+       implicit val validator = userValidator
+         .ruleOption(validateUserOption, User_Invalid, User_validated_none_option)
+       
+       "properly validate on Some(true)" in {
+         user_Valid.isValidAsync.map(r => r must be (true))
+       }
+
+       "properly invalidate on Some(false) case" in {
+         val expectedError = ValidationError(
+           message = User_Invalid
+         )
+         user_Valid2.isValidAsync.map(r => r must be (false))
+         user_Valid2.validateAsync.map { r =>
+           r.errors must contain (expectedError)
+         }
+       }
+
+       "properly invalidate None case" in {
+         val expectedError = ValidationError(
+           message = User_validated_none_option
+         )
+         user_Invalid1.isValidAsync.map(r => r must be (false))
+         user_Invalid1.validateAsync.map { r =>
+           r.errors must contain (expectedError)
+         }
+       }
+     }
   }
 }
