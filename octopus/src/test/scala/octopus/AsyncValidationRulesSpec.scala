@@ -86,6 +86,23 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
       }
     }
 
+    "Catch only wanted exception" should {
+      "catch and handle predicted exception" in {
+        implicit val validator = userValidator
+          .ruleCatchOnly[IOException](userThrowIOException, User_Invalid, _ => Exception_handled_during_validation)
+
+        user_Valid.isValidAsync.map(r => r must be (false))
+      }
+
+      "resolve in error in case of not predicted exception" in {
+        implicit val validator = userValidator
+          .ruleCatchOnly[IOException](userThrowNonFatal, User_Invalid, _ => Exception_handled_during_validation)
+
+        user_Valid.isValidAsync.map(r => r must be (false))
+        user_Valid.isValidAsync.failed.map(r => r mustBe an [Exception])
+      }
+    }
+
     "Work with all 3 cases of either" should {
       implicit val validator = userValidator
         .ruleEither(validateUserEither, Email_invalid)
