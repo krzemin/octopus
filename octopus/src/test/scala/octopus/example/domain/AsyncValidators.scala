@@ -27,7 +27,7 @@ class AsyncValidators(emailService: EmailService,
       .async.ruleVC(emailService.isEmailTaken, Email_Err_AlreadyTaken)
       .async.rule(_.address, emailService.doesDomainExists, Email_Err_DomainDoesNotExists)
       .rule(_.address, (_: String).nonEmpty, Email.Err_MustNotBeEmpty)
-  // repeated to check dsl behavior & to ensure that it keep the validator in the asynchronous world
+      // repeated to check dsl behavior & to ensure that it keep the validator in the asynchronous world
 
   val PostalCode_Err_DoesNotExist = "postal code does not exist"
 
