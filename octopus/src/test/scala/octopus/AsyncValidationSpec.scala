@@ -2,15 +2,14 @@ package octopus
 
 import octopus.example.domain._
 import octopus.syntax._
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{AsyncWordSpec, MustMatchers}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AsyncValidationSpec
-  extends WordSpec with MustMatchers with Fixtures
-    with ScalaFutures with IntegrationPatience {
+  extends AsyncWordSpec with MustMatchers with Fixtures
+    with ScalaFutures {
 
   val emailServiceStub = new EmailService {
     def isEmailTaken(email: String): Future[Boolean] =
@@ -38,27 +37,30 @@ class AsyncValidationSpec
       "validate using validators from scope" should {
 
         "case 1 - valid" in {
-          email_Valid.isValidAsync.futureValue mustBe true
+          email_Valid.isValidAsync.map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
-           email_Valid_Long.validateAsync.futureValue.errors must contain (ValidationError(Email_Err_AlreadyTaken))
+           email_Valid_Long.validateAsync
+             .map(_.errors must contain (ValidationError(Email_Err_AlreadyTaken)))
         }
       }
 
       "automatically derive AsyncValidator instances" should {
 
         "case 1 - valid" in {
-          user_Valid.isValidAsync.futureValue mustBe true
+          user_Valid.isValidAsync.map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
           val address_InvalidPostalCode = address_Valid.copy(postalCode = PostalCode("23456"))
           val user_InvalidPostalCode = user_Valid.copy(address = address_InvalidPostalCode)
 
-          user_InvalidPostalCode.validateAsync.futureValue.toFieldErrMapping mustBe List(
-            "address.postalCode" -> PostalCode_Err_DoesNotExist
-          )
+          user_InvalidPostalCode.validateAsync.map {
+            _.toFieldErrMapping mustBe List(
+              "address.postalCode" -> PostalCode_Err_DoesNotExist
+            )
+          }
         }
       }
     }
@@ -68,11 +70,11 @@ class AsyncValidationSpec
       "auto generate trivial async validator instance from the sync one" should {
 
         "case 1 - valid all in all" in {
-          email_Valid.isValidAsync.futureValue mustBe true
+          email_Valid.isValidAsync.map(_ mustBe true)
         }
 
         "case 2 - invalid in the context of async, but valid here" in {
-          email_Valid_Long.isValidAsync.futureValue mustBe true
+          email_Valid_Long.isValidAsync.map(_ mustBe true)
         }
       }
     }
