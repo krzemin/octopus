@@ -23,8 +23,7 @@ object DerivedValidator extends LowPriorityValidatorDerivation {
     (opt: Option[T]) => opt.map(v.validate).getOrElse(Nil)
   }
 
-  implicit def traversableValidator[T, M[_]](implicit ev: M[T] <:< Traversable[T],
-                                             v: Validator[T]): DerivedValidator[M[T]] = DerivedValidator {
+  implicit def traversableValidator[T, M[S] <: Traversable[S]](implicit v: Validator[T]): DerivedValidator[M[T]] = DerivedValidator {
     (elems: M[T]) =>
       elems.toList.zipWithIndex.flatMap { case (elem, idx) =>
         v.validate(elem).map(CollectionIndex(idx) :: _)
