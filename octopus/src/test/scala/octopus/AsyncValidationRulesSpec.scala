@@ -6,12 +6,12 @@ import octopus.dsl._
 import octopus.example.domain.{Email, User}
 import octopus.syntax._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.{AsyncWordSpec, MustMatchers}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AsyncValidationRulesSpec extends WordSpec
+
+class AsyncValidationRulesSpec extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
   with IntegrationPatience
@@ -49,7 +49,7 @@ class AsyncValidationRulesSpec extends WordSpec
         .ruleField('email, isEmailUnique, Email_does_not_contain_a)
 
       "accept proper email" in {
-        user_Valid2.isValidAsync.futureValue mustBe true
+        user_Valid2.isValidAsync.map(_ mustBe true)
       }
 
       "reject invalid email" in {
@@ -59,8 +59,8 @@ class AsyncValidationRulesSpec extends WordSpec
           path = FieldPath(List(FieldLabel('email)))
         )
 
-        user_Valid.isValidAsync.futureValue mustBe false
-        user_Valid.validateAsync.futureValue.errors must contain (expectedValidationError)
+        user_Valid.isValidAsync.map(_ mustBe false)
+        user_Valid.validateAsync.map(_.errors must contain (expectedValidationError))
       }
     }
 
@@ -70,7 +70,7 @@ class AsyncValidationRulesSpec extends WordSpec
         .ruleField('email, emailCheckThrowing, Email_does_not_contain_a)
 
       "throw on validation check" in {
-        user_Valid.isValidAsync.failed.futureValue mustBe an [IOException]
+        user_Valid.isValidAsync.failed.map(_  mustBe an [IOException])
       }
     }
 
@@ -84,8 +84,8 @@ class AsyncValidationRulesSpec extends WordSpec
           message = Exception_handled_during_validation
         )
 
-        user_Valid.isValidAsync.futureValue mustBe false
-        user_Valid.validateAsync.futureValue.errors must contain (expectedValidationException)
+        user_Valid.isValidAsync.map(_  mustBe false)
+        user_Valid.validateAsync.map(_.errors must contain (expectedValidationException))
       }
     }
 
@@ -94,7 +94,7 @@ class AsyncValidationRulesSpec extends WordSpec
         implicit val validator = userValidator
           .ruleCatchOnly[IOException](userThrowIOException, User_Invalid, _ => Exception_handled_during_validation)
 
-        user_Valid.isValidAsync.futureValue mustBe false
+        user_Valid.isValidAsync.map(_ mustBe false)
       }
 
       "resolve in error in case of not predicted exception" in {
@@ -110,7 +110,7 @@ class AsyncValidationRulesSpec extends WordSpec
         .ruleEither(validateUserEither, Email_invalid)
 
       "properly validate on Right(true)" in {
-        user_Valid.isValidAsync.futureValue mustBe true
+        user_Valid.isValidAsync.map(_ mustBe true)
       }
 
       "properly invalidate on Right(false) case" in {
@@ -118,8 +118,8 @@ class AsyncValidationRulesSpec extends WordSpec
           message = Email_invalid
         )
 
-        user_Valid2.isValidAsync.futureValue mustBe false
-        user_Valid2.validateAsync.futureValue.errors must contain (expectedError)
+        user_Valid2.isValidAsync.map(_ mustBe false)
+        user_Valid2.validateAsync.map(_.errors must contain (expectedError))
       }
 
       "properly invalidate with message on Left case" in {
@@ -127,35 +127,34 @@ class AsyncValidationRulesSpec extends WordSpec
           message = Email_validated_left_case
         )
 
-        user_Invalid1.isValidAsync.futureValue mustBe false
-        user_Invalid1.validateAsync.futureValue.errors must contain (expectedError)
+        user_Invalid1.isValidAsync.map(_ mustBe false)
+        user_Invalid1.validateAsync.map(_.errors must contain (expectedError))
       }
     }
-     "Work with all 3 cases of option" should {
 
-       implicit val validator = userValidator
-         .ruleOption(validateUserOption, User_Invalid, User_validated_none_option)
-       
-       "properly validate on Some(true)" in {
-         user_Valid.isValidAsync.futureValue mustBe true
-       }
+    "Work with all 3 cases of option" should {
+      implicit val validator = userValidator
+        .ruleOption(validateUserOption, User_Invalid, User_validated_none_option)
 
-       "properly invalidate on Some(false) case" in {
-         val expectedError = ValidationError(
-           message = User_Invalid
-         )
+      "properly validate on Some(true)" in {
+        user_Valid.isValidAsync.map(_ mustBe true)
+      }
 
-         user_Valid2.isValidAsync.futureValue mustBe false
-         user_Valid2.validateAsync.futureValue.errors must contain (expectedError)
-       }
+      "properly invalidate on Some(false) case" in {
+        val expectedError = ValidationError(
+          message = User_Invalid
+        )
+        user_Valid2.isValidAsync.map(_ mustBe false)
+        user_Valid2.validateAsync.map(_.errors must contain (expectedError))
+      }
 
-       "properly invalidate None case" in {
-         val expectedError = ValidationError(
-           message = User_validated_none_option
-         )
-         user_Invalid1.isValidAsync.futureValue mustBe false
-         user_Invalid1.validateAsync.futureValue.errors must contain (expectedError)
-       }
-     }
+      "properly invalidate None case" in {
+        val expectedError = ValidationError(
+          message = User_validated_none_option
+        )
+        user_Invalid1.isValidAsync.map(_ mustBe false)
+        user_Invalid1.validateAsync.map(_.errors must contain (expectedError))
+      }
+    }
   }
 }
