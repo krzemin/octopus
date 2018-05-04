@@ -1,10 +1,12 @@
 package octopus.example.domain
 
-import octopus.Fixtures
 import octopus.dsl._
 import octopus.syntax._
+import octopus.{Fixtures, ValidationError}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{AsyncWordSpec, MustMatchers}
+
+import scala.util.{Failure, Success, Try}
 
 class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
   with ScalaFutures
@@ -75,6 +77,53 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         val expectedError = ValidationError("Empty email")
         user_Invalid3.isValidAsync.map(_ mustBe false)
         user_Invalid3.validateAsync.map(_.errors must contain (expectedError))
+      }
+    }
+    "validate with Either case" should {
+
+      def stringValueGT10(str: String): Either[String, Boolean] = {
+        Try(str.toInt) match {
+          case Failure(error) => Left(s"${error.getClass.getName}: ${error.getMessage}")
+          case Success(v) => Right( v > 10 )
+        }
+      }
+      val invalidMessage = "String value is not > 10"
+      implicit val v = AsyncValidator[User]
+        .ruleEither(u => stringValueGT10(u.name.name), invalidMessage)
+
+      "detect value >10" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("15"))
+
+        user.isValidAsync.map(_ mustBe true)
+      }
+
+      "return invalid massage on invalid case" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("3"))
+        val expectedError = ValidationError("String value is not > 10")
+
+        user.isValidAsync.map(_ mustBe false)
+        user.validateAsync.map(_.errors must contain (expectedError))
+      }
+
+      "return invalid message on error case" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("your name"))
+        val expectedError = ValidationError("java.lang.NumberFormatException: For input string: \"your name\"")
+
+        user.isValidAsync.map(_ mustBe false)
+        user.validateAsync.map(_.errors must contain (expectedError))
+
       }
     }
   }
