@@ -54,6 +54,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         user_Valid2.isValidAsync.map(_ mustBe false)
       }
     }
+
     "validate with option case" should {
       implicit val v = AsyncValidator[User]
         .ruleOption(
@@ -79,6 +80,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         user_Invalid3.validateAsync.map(_.errors must contain (expectedError))
       }
     }
+
     "validate with Either case" should {
 
       def stringValueGT10(str: String): Either[String, Boolean] = {
@@ -125,6 +127,68 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         user.validateAsync.map(_.errors must contain (expectedError))
 
       }
+    }
+
+    "validate catch only" should {
+
+      def throwingStringIntValue(value: String): Boolean = {
+        val intVal = value.toInt
+        if(intVal == 10) throw new IllegalArgumentException("Value is not greater then 10")
+        else if(intVal < 5) false
+        else true
+      }
+
+      val invalidMessage = "Value passed was not greater then 5"
+
+      implicit val v = AsyncValidator[User]
+        .ruleCatchOnly[NumberFormatException](
+          u => throwingStringIntValue(u.name.name),
+          invalidMessage,
+          e => "Number format exception!")
+
+      "validate proper case" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("12"))
+
+        user.isValidAsync.map(_ mustBe true)
+      }
+
+      "validate inproper case" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("4"))
+
+        user.isValidAsync.map(_ mustBe false)
+        user.validateAsync.map(_.errors must contain (ValidationError(invalidMessage)))
+      }
+
+      "catch expected error" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("some name"))
+
+        user.isValidAsync.map(_ mustBe false)
+        user.validateAsync.map(_.errors must contain (ValidationError("Number format exception!")))
+      }
+
+      "fail on unexpected error" in {
+        val user = User(
+          id = UserId(1111),
+          email = email_Valid_Long,
+          address = address_Valid,
+          name = Name("10"))
+
+        user.isValidAsync.map(_ mustBe false)
+        user.validateAsync.failed.map(_  mustBe an [IllegalArgumentException])
+      }
+
     }
   }
 
