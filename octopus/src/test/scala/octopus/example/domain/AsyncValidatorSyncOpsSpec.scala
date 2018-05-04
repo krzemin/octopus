@@ -52,6 +52,31 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         user_Valid2.isValidAsync.map(_ mustBe false)
       }
     }
+    "validate with option case" should {
+      implicit val v = AsyncValidator[User]
+        .ruleOption(
+          u => u.email.address.headOption.map(_ == 'x'),
+          "Email doesn't start with x",
+          "Empty email"
+        )
+
+      "approve user with email starting with x" in {
+        user_Valid.isValidAsync.map(_ mustBe true)
+      }
+
+      "detect email not starting with x" in {
+        val expectedError = ValidationError("Email doesn't start with x")
+        user_Valid2.isValidAsync.map(_ mustBe false)
+        user_Valid2.validateAsync.map(_.errors must contain(expectedError))
+
+      }
+
+      "detect empty email" in {
+        val expectedError = ValidationError("Empty email")
+        user_Invalid3.isValidAsync.map(_ mustBe false)
+        user_Invalid3.validateAsync.map(_.errors must contain (expectedError))
+      }
+    }
   }
 
 }
