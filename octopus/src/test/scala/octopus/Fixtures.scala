@@ -22,7 +22,7 @@ trait Fixtures {
   val address_Invalid1 = Address("", postalCode_Invalid1, "")
   val address_Invalid2 = Address("Love Street", postalCode_Valid, "")
 
-  val name_Valid = Name("John")
+  val name_Valid = Age("John")
 
   val user_Valid = User(userId_Valid, email_Valid, address_Valid, name_Valid)
   val user_Valid2 = User(userId_Valid, email_Valid_Long, address_Valid, name_Valid)

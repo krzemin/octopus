@@ -90,41 +90,29 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         }
       }
       val invalidMessage = "String value is not > 10"
-      implicit val v = AsyncValidator[User]
-        .ruleEither(u => stringValueGT10(u.name.name), invalidMessage)
+      implicit val v = AsyncValidator[Age]
+        .ruleEither(a => stringValueGT10(a.value), invalidMessage)
 
       "detect value >10" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("15"))
+        val age = Age("15")
 
-        user.isValidAsync.map(_ mustBe true)
+        age.isValidAsync.map(_ mustBe true)
       }
 
       "return invalid massage on invalid case" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("3"))
+        val age = Age("3")
         val expectedError = ValidationError("String value is not > 10")
 
-        user.isValidAsync.map(_ mustBe false)
-        user.validateAsync.map(_.errors must contain (expectedError))
+        age.isValidAsync.map(_ mustBe false)
+        age.validateAsync.map(_.errors must contain (expectedError))
       }
 
       "return invalid message on error case" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("your name"))
+        val age = Age("your name")
         val expectedError = ValidationError("java.lang.NumberFormatException: For input string: \"your name\"")
 
-        user.isValidAsync.map(_ mustBe false)
-        user.validateAsync.map(_.errors must contain (expectedError))
+        age.isValidAsync.map(_ mustBe false)
+        age.validateAsync.map(_.errors must contain (expectedError))
 
       }
     }
@@ -140,55 +128,38 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
 
       val invalidMessage = "Value passed was not greater then 5"
 
-      implicit val v = AsyncValidator[User]
+      implicit val v = AsyncValidator[Age]
         .ruleCatchOnly[NumberFormatException](
-          u => throwingStringIntValue(u.name.name),
+          a => throwingStringIntValue(a.value),
           invalidMessage,
           e => "Number format exception!")
 
       "validate proper case" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("12"))
+        val age = Age("12")
 
-        user.isValidAsync.map(_ mustBe true)
+        age.isValidAsync.map(_ mustBe true)
       }
 
       "validate inproper case" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("4"))
+        val age = Age("4")
 
-        user.isValidAsync.map(_ mustBe false)
-        user.validateAsync.map(_.errors must contain (ValidationError(invalidMessage)))
+        age.isValidAsync.map(_ mustBe false)
+        age.validateAsync.map(_.errors must contain (ValidationError(invalidMessage)))
       }
 
       "catch expected error" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("some name"))
+        val age = Age("some name")
 
-        user.isValidAsync.map(_ mustBe false)
-        user.validateAsync.map(_.errors must contain (ValidationError("Number format exception!")))
+        age.isValidAsync.map(_ mustBe false)
+        age.validateAsync.map(_.errors must contain (ValidationError("Number format exception!")))
       }
 
       "fail on unexpected error" in {
-        val user = User(
-          id = UserId(1111),
-          email = email_Valid_Long,
-          address = address_Valid,
-          name = Name("10"))
+        val age = Age("10")
 
-        user.isValidAsync.map(_ mustBe false)
-        user.validateAsync.failed.map(_  mustBe an [IllegalArgumentException])
+        age.isValidAsync.map(_ mustBe false)
+        age.validateAsync.failed.map(_  mustBe an [IllegalArgumentException])
       }
-
     }
   }
 
