@@ -131,7 +131,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
         .ruleCatchOnly[NumberFormatException](
           a => throwingStringIntValue(a.value),
           invalidMessage,
-          e => "Number format exception!")
+          _ => "Number format exception!")
 
       "validate proper case" in {
         val age = Age("12")
