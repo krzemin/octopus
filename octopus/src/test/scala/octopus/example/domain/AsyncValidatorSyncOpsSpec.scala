@@ -122,7 +122,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
       def throwingStringIntValue(value: String): Boolean = {
         val intVal = value.toInt
         if(intVal == 10) throw new IllegalArgumentException("Value is not greater then 10")
-        intVal >= 5
+        else intVal >= 5
       }
 
       val invalidMessage = "Value passed was not greater then 5"
