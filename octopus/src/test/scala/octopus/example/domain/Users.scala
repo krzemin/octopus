@@ -69,7 +69,7 @@ case class Age(value: String)
 case class User(id: UserId,
                 email: Email,
                 address: Address,
-                name: Age)
+                age: Age)
 
 case class BigCaseClass(user1: User,
                         user2: User,
