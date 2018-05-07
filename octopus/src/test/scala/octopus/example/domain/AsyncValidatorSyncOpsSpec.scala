@@ -86,7 +86,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
       def stringValueGT10(str: String): Either[String, Boolean] = {
         Try(str.toInt) match {
           case Failure(error) => Left(s"${error.getClass.getName}: ${error.getMessage}")
-          case Success(v) => Right( v > 10 )
+          case Success(intVal) => Right(intVal > 10)
         }
       }
       val invalidMessage = "String value is not > 10"
