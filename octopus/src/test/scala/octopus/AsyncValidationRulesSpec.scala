@@ -17,10 +17,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
   with IntegrationPatience
   with MustMatchers {
 
-  private def isEmailUnique(email: Email): Future[Boolean] = Future.successful(email.address.contains("a"))
-  private def emailCheckThrowing(email: Email): Future[Boolean] = Future.failed(new IOException())
   private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_handled_during_validation))
-  private def userThrowIOException(user: User): Future[Boolean] = Future.failed(new IOException())
   private def validateUserEither(user: User): Future[Either[String, Boolean]] = Future.successful { user.email match {
     case Email(address) if address == email_Valid.address => Right(true)
     case Email(address) if address == email_Valid_Long.address => Right(false)
@@ -46,7 +43,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     "Simple email validator" should {
 
       implicit val userUniqueEmailValidator = userValidator
-        .ruleField('email, isEmailUnique, Email_does_not_contain_a)
+        .ruleField('email, (email: Email) => Future.successful(email.address.contains("a")), Email_does_not_contain_a)
 
       "accept proper email" in {
         user_Valid2.isValidAsync.map(_ mustBe true)
@@ -67,7 +64,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     "Throwing email validator" should {
 
       implicit val userUniqueThrowingValidator = userValidator
-        .ruleField('email, emailCheckThrowing, Email_does_not_contain_a)
+        .ruleField('email, (_: Email) => Future.failed(new IOException()), Email_does_not_contain_a)
 
       "throw on validation check" in {
         user_Valid.isValidAsync.failed.map(_  mustBe an [IOException])
@@ -92,7 +89,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     "Catch only wanted exception" should {
       "catch and handle predicted exception" in {
         implicit val validator = userValidator
-          .ruleCatchOnly[IOException](userThrowIOException, User_Invalid, _ => Exception_handled_during_validation)
+          .ruleCatchOnly[IOException](_ => Future.failed(new IOException()), User_Invalid, _ => Exception_handled_during_validation)
 
         user_Valid.isValidAsync.map(_ mustBe false)
       }
