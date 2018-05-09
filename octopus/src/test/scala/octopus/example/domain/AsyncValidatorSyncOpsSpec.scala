@@ -18,7 +18,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
 
     "basic validation" should {
       implicit val v = AsyncValidator[User]
-        .rule(u => u.email.address == email_Valid.address, "Invalid email")
+        .rule(_.email.address == email_Valid.address, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
@@ -44,7 +44,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
 
     "validate field" should {
       implicit val v = AsyncValidator[User]
-        .ruleField('email, (e: Email) => e.address == email_Valid.address, "Invalid email")
+        .ruleField[User](_.email,  (_: Email).address == email_Valid.address, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
@@ -58,7 +58,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
     "validate with option case" should {
       implicit val v = AsyncValidator[User]
         .ruleOption(
-          u => u.email.address.headOption.map(_ == 'x'),
+          _.email.address.headOption.map(_ == 'x'),
           "Email doesn't start with x",
           "Empty email"
         )
