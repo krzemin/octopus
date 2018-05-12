@@ -2,13 +2,14 @@ package octopus
 
 import octopus.example.domain._
 import octopus.syntax._
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
+import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 
 class AsyncValidationSpec
-  extends AsyncWordSpec with MustMatchers with Fixtures
+  extends AsyncWordSpec
+    with MustMatchers with Fixtures
     with ScalaFutures {
 
   val emailServiceStub = new EmailService {
@@ -76,6 +77,21 @@ class AsyncValidationSpec
         "case 2 - invalid in the context of async, but valid here" in {
           email_Valid_Long.isValidAsync.map(_ mustBe true)
         }
+      }
+    }
+
+    "have invalid validator in the scope" should {
+      val Email_Err_ExternalCause = "External cause"
+      implicit val invalidValidator = AsyncValidator.invalid[Email](Email_Err_ExternalCause)
+
+      "be invalid on valid case" in {
+        email_Valid.isValidAsync.map(_ mustBe false)
+        email_Valid.validateAsync.map(_.errors must contain (ValidationError(Email_Err_ExternalCause)))
+      }
+
+      "be invalid with predefined error on invalid case" in {
+        email_Invalid1.isValidAsync.map(_ mustBe false)
+        email_Invalid1.validateAsync.map(_.errors must contain (ValidationError(Email_Err_ExternalCause)))
       }
     }
   }
