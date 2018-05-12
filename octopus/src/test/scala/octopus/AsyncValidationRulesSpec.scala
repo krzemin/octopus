@@ -43,7 +43,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     "Simple email validator" should {
 
       implicit val userUniqueEmailValidator = userValidator
-        .ruleField('email, (email: Email) => Future.successful(email.address.contains("a")), Email_Err_DoesNotContainA)
+        .rule(_.email, (email: Email) => Future.successful(email.address.contains("a")), Email_Err_DoesNotContainA)
 
       "accept proper email" in {
         user_Valid2.isValidAsync.map(_ mustBe true)
@@ -64,7 +64,7 @@ class AsyncValidationRulesSpec extends AsyncWordSpec
     "Throwing email validator" should {
 
       implicit val userUniqueThrowingValidator = userValidator
-        .ruleField('email, (_: Email) => Future.failed(new IOException()), Email_Err_DoesNotContainA)
+        .rule(_.email, (_: Email) => Future.failed(new IOException()), Email_Err_DoesNotContainA)
 
       "throw on validation check" in {
         user_Valid.isValidAsync.failed.map(_  mustBe an [IOException])
