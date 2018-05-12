@@ -3,7 +3,7 @@ package octopus.example.domain
 import octopus.dsl._
 import octopus.syntax._
 import octopus.{Fixtures, ValidationError}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.util.{Failure, Success, Try}
@@ -11,7 +11,6 @@ import scala.util.{Failure, Success, Try}
 class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
-  with IntegrationPatience
   with MustMatchers {
 
   "AsyncValidatorSyncOps" when {

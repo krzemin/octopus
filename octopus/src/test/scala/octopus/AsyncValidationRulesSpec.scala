@@ -5,7 +5,7 @@ import java.io.IOException
 import octopus.dsl._
 import octopus.example.domain.{Email, User}
 import octopus.syntax._
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.concurrent.Future
@@ -14,7 +14,6 @@ import scala.concurrent.Future
 class AsyncValidationRulesSpec extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
-  with IntegrationPatience
   with MustMatchers {
 
   private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_HandledDuringValidation))
