@@ -44,7 +44,7 @@ class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
 
     "validate field" should {
       implicit val v = AsyncValidator[User]
-        .ruleField[User](_.email,  (_: Email).address == email_Valid.address, "Invalid email")
+        .rule(_.email,  (_: Email).address == email_Valid.address, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
