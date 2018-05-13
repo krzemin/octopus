@@ -1,7 +1,6 @@
 package octopus
 
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
-import shapeless.ops.record.Selector
+import shapeless.{::, Generic, HNil}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.experimental.macros

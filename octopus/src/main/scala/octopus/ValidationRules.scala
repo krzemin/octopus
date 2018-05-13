@@ -1,11 +1,10 @@
 package octopus
 
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
-import shapeless.ops.record.Selector
+import shapeless.{::, Generic, HNil}
 
 import scala.reflect.ClassTag
-import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 object ValidationRules {
 

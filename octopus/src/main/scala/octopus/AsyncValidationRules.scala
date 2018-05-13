@@ -1,8 +1,7 @@
 package octopus
 
 import octopus.AsyncValidator.instance
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
-import shapeless.ops.record.Selector
+import shapeless.{::, Generic, HNil}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
