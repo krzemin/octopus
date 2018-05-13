@@ -64,9 +64,12 @@ object Address {
     .rule(_.street, (_: String).nonEmpty, Err_MustNotBeEmpty)
 }
 
+case class Age(value: String)
+
 case class User(id: UserId,
                 email: Email,
-                address: Address)
+                address: Address,
+                age: Age)
 
 case class BigCaseClass(user1: User,
                         user2: User,

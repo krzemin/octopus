@@ -22,9 +22,13 @@ trait Fixtures {
   val address_Invalid1 = Address("", postalCode_Invalid1, "")
   val address_Invalid2 = Address("Love Street", postalCode_Valid, "")
 
-  val user_Valid = User(userId_Valid, email_Valid, address_Valid)
-  val user_Invalid1 = User(userId_Invalid, email_Invalid2, address_Invalid1)
-  val user_Invalid2 = User(userId_Invalid, email_Valid, address_Valid)
+  val age_Valid = Age("John")
+
+  val user_Valid = User(userId_Valid, email_Valid, address_Valid, age_Valid)
+  val user_Valid2 = User(userId_Valid, email_Valid_Long, address_Valid, age_Valid)
+  val user_Invalid1 = User(userId_Invalid, email_Invalid2, address_Invalid1, age_Valid)
+  val user_Invalid2 = User(userId_Invalid, email_Valid, address_Valid, age_Valid)
+  val user_Invalid3 = User(userId_Valid, email_Invalid1, address_Valid, age_Valid)
 
   val shape_circle_Valid: Shape = Circle(10.5)
   val shape_circle_Invalid: Shape = Circle(-3.1)
