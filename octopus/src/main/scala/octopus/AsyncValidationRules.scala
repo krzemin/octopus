@@ -24,17 +24,6 @@ object AsyncValidationRules {
         .validate(gen.to(obj).head)(ec)
     }
 
-  def ruleField[T, R <: HList, U](field: Witness, asyncPred: U => Future[Boolean], whenInvalid: String)
-                                 (implicit ev: field.T <:< Symbol,
-                                  gen: LabelledGeneric.Aux[T, R],
-                                  sel: Selector.Aux[R, field.T, U])
-  : AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      rule[U](asyncPred, whenInvalid)
-        .validate(sel(gen.to(obj)))(ec)
-        .map(errs => errs.map(FieldLabel(field.value) :: _))(ec)
-    }
-
   def ruleCatchOnly[T, E <: Throwable : ClassTag](asyncPred: T => Future[Boolean],
                                                   whenInvalid: String,
                                                   whenCaught: E => String): AsyncValidator[T] =

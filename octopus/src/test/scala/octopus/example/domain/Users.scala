@@ -60,7 +60,7 @@ object Address {
 
   implicit val validator: Validator[Address] = Validator
     .derived[Address]
-    .ruleField('city, (_: String).nonEmpty, Err_MustNotBeEmpty)
+    .rule(_.city, (_: String).nonEmpty, Err_MustNotBeEmpty)
     .rule(_.street, (_: String).nonEmpty, Err_MustNotBeEmpty)
 }
 

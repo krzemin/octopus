@@ -40,12 +40,6 @@ object dsl {
                  (implicit gen: Generic.Aux[T, V :: HNil]): Validator[T] =
       compose(ValidationRules.ruleVC(pred, whenInvalid))
 
-    def ruleField[R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): Validator[T] =
-      compose(ValidationRules.ruleField(field, pred, whenInvalid))
-
     def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean,
                                                  whenInvalid: String,
                                                  whenCaught: E => String): Validator[T] =
@@ -103,12 +97,6 @@ object dsl {
                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[T] =
       compose(AsyncValidationRules.ruleVC(asyncPred, whenInvalid))
 
-    def ruleField[R <: HList, U](field: Witness, asyncPred: U => Future[Boolean], whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): AsyncValidator[T] =
-      compose(AsyncValidationRules.ruleField(field, asyncPred, whenInvalid))
-
     def ruleCatchOnly[E <: Throwable : ClassTag](asyncPred: T => Future[Boolean],
                                                  whenInvalid: String,
                                                  whenCaught: E => String): AsyncValidator[T] =
@@ -165,12 +153,6 @@ object dsl {
     def ruleVC[V](pred: V => Boolean, whenInvalid: String)
                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[T] =
       compose(ValidationRules.ruleVC(pred, whenInvalid))
-
-    def ruleField[R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): AsyncValidator[T] =
-      compose(ValidationRules.ruleField(field, pred, whenInvalid))
 
     def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean,
                                                  whenInvalid: String,

@@ -17,15 +17,6 @@ object ValidationRules {
     (obj: T) => rule[V](pred, whenInvalid)
       .validate(gen.to(obj).head)
 
-  def ruleField[T, R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                 (implicit ev: field.T <:< Symbol,
-                                  gen: LabelledGeneric.Aux[T, R],
-                                  sel: Selector.Aux[R, field.T, U])
-  : Validator[T] =
-    (obj: T) => rule[U](pred, whenInvalid)
-      .validate(sel(gen.to(obj)))
-      .map(FieldLabel(field.value) :: _)
-
   def ruleCatchOnly[T, E <: Throwable : ClassTag](pred: T => Boolean,
                                                   whenInvalid: String,
                                                   whenCaught: E => String): Validator[T] =
