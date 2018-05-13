@@ -11,7 +11,8 @@ import org.scalatest.{AsyncWordSpec, MustMatchers}
 import scala.concurrent.Future
 
 
-class AsyncValidationRulesSpec extends AsyncWordSpec
+class AsyncValidationRulesSpec
+  extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
   with MustMatchers {

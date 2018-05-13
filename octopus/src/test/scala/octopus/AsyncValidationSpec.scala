@@ -9,8 +9,9 @@ import scala.concurrent.Future
 
 class AsyncValidationSpec
   extends AsyncWordSpec
-    with MustMatchers with Fixtures
-    with ScalaFutures {
+  with MustMatchers
+  with Fixtures
+  with ScalaFutures {
 
   val emailServiceStub = new EmailService {
     def isEmailTaken(email: String): Future[Boolean] =

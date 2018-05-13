@@ -8,7 +8,8 @@ import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.util.{Failure, Success, Try}
 
-class AsyncValidatorSyncOpsSpec extends AsyncWordSpec
+class AsyncValidatorSyncOpsSpec
+  extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
   with MustMatchers {
