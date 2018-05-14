@@ -1,8 +1,8 @@
-package octopus.example.domain
+package octopus
 
 import octopus.dsl._
+import octopus.example.domain.{Age, Email, User}
 import octopus.syntax._
-import octopus.{Fixtures, ValidationError}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
@@ -18,7 +18,7 @@ class AsyncValidatorSyncOpsSpec
 
     "basic validation" should {
       implicit val v = AsyncValidator[User]
-        .rule(_.email.address == email_Valid.address, "Invalid email")
+        .rule(_.email == email_Valid, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
@@ -31,7 +31,7 @@ class AsyncValidatorSyncOpsSpec
 
     "validation with mapping" should {
       implicit val v = AsyncValidator[User]
-        .rule[Email](_.email, _.address == email_Valid.address, "Invalid email")
+        .rule(_.email, (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
@@ -44,7 +44,7 @@ class AsyncValidatorSyncOpsSpec
 
     "validate field" should {
       implicit val v = AsyncValidator[User]
-        .rule(_.email,  (_: Email).address == email_Valid.address, "Invalid email")
+        .rule(_.email,  (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
         user_Valid.isValidAsync.map(_ mustBe true)
