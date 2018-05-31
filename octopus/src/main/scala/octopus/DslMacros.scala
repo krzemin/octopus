@@ -1,6 +1,6 @@
 package octopus
 
-import scala.concurrent.Future
+import scala.language.higherKinds
 
 private[octopus] object DslMacros {
 
@@ -32,10 +32,10 @@ private[octopus] object DslMacros {
     }
   }
 
-  def ruleFieldSelectorAsync[T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
+  def ruleFieldSelectorAsync[M[_], T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
                                                                 (selector: c.Expr[T => F],
-                                                                 pred: c.Expr[F => Future[Boolean]],
-                                                                 whenInvalid: c.Expr[String]): c.Expr[AsyncValidator[T]] = {
+                                                                 pred: c.Expr[F => M[Boolean]],
+                                                                 whenInvalid: c.Expr[String])(implicit M: c.WeakTypeTag[M[_]]): c.Expr[AsyncValidator[M, T]] = {
     import c.universe._
     selector.tree match {
       case q"($_) => $_.${fieldName: Name}" =>
@@ -44,14 +44,14 @@ private[octopus] object DslMacros {
         val F = weakTypeOf[F]
         val obj = TermName(c.freshName("obj"))
         val ec = TermName(c.freshName("ec"))
-        c.Expr[AsyncValidator[T]] {
+        c.Expr[AsyncValidator[M, T]] {
           q"""
              {${c.prefix}}.compose {
-               _root_.octopus.AsyncValidator.instance[$T] { ($obj: $T, $ec: _root_.scala.concurrent.ExecutionContext) =>
+               _root_.octopus.AsyncValidator.instance[$M, $T] { ($obj: $T) =>
                  _root_.octopus.AsyncValidationRules
                    .rule[$F]($pred, $whenInvalid)
                    .validate($selector($obj))($ec)
-                   .map(errs => errs.map(_root_.octopus.FieldLabel($fieldSymbol) :: _))($ec)
+                   .map(errs => errs.map(_root_.octopus.FieldLabel($fieldSymbol) :: _))
                }
              }
           """
@@ -61,10 +61,10 @@ private[octopus] object DslMacros {
     }
   }
 
-  def ruleFieldSelectorSync[T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
+  def ruleFieldSelectorSync[M[_], T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
                                                                (selector: c.Expr[T => F],
                                                                 pred: c.Expr[F => Boolean],
-                                                                whenInvalid: c.Expr[String]): c.Expr[AsyncValidator[T]] = {
+                                                                whenInvalid: c.Expr[String]): c.Expr[AsyncValidator[M, T]] = {
     import c.universe._
     selector.tree match {
       case q"($_) => $_.${fieldName: Name}" =>
@@ -72,7 +72,7 @@ private[octopus] object DslMacros {
         val T = weakTypeOf[T]
         val F = weakTypeOf[F]
         val obj = TermName(c.freshName("obj"))
-        c.Expr[AsyncValidator[T]] {
+        c.Expr[AsyncValidator[M, T]] {
           q"""
              {${c.prefix}}.compose {
                _root_.octopus.Validator.instance[$T] { ($obj: $T) =>

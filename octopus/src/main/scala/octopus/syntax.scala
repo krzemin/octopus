@@ -1,6 +1,6 @@
 package octopus
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.language.higherKinds
 
 object syntax {
 
@@ -15,15 +15,13 @@ object syntax {
 
   implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
 
-    def validateAsync(implicit av: AsyncValidator[T],
-                      ec: ExecutionContext): Future[ValidationResult[T]] =
-      av.validate(obj)(ec).map { errors =>
+    def validateAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[ValidationResult[T]] =
+      implicitly[App[M]].map(av.validate(obj)) { errors =>
         new ValidationResult(obj, errors)
       }
 
-    def isValidAsync(implicit av: AsyncValidator[T],
-                     ec: ExecutionContext): Future[Boolean] =
-      validateAsync.map(_.isValid)
+    def isValidAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[Boolean] =
+      implicitly[App[M]].map(validateAsync)(_.isValid)
   }
 
 }
