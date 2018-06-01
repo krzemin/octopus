@@ -43,14 +43,13 @@ private[octopus] object DslMacros {
         val T = weakTypeOf[T]
         val F = weakTypeOf[F]
         val obj = TermName(c.freshName("obj"))
-        val ec = TermName(c.freshName("ec"))
         c.Expr[AsyncValidator[M, T]] {
           q"""
              {${c.prefix}}.compose {
                _root_.octopus.AsyncValidator.instance[$M, $T] { ($obj: $T) =>
                  _root_.octopus.AsyncValidationRules
-                   .rule[$F]($pred, $whenInvalid)
-                   .validate($selector($obj))($ec)
+                   .rule[$M, $F]($pred, $whenInvalid)
+                   .validate($selector($obj))
                    .map(errs => errs.map(_root_.octopus.FieldLabel($fieldSymbol) :: _))
                }
              }
