@@ -1,8 +1,7 @@
 package octopus
 
 import octopus.AsyncValidator.instance
-import shapeless.ops.record.Selector
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
+import shapeless.{::, Generic, HNil}
 
 import scala.language.higherKinds
 import scala.reflect.ClassTag
@@ -22,18 +21,7 @@ object AsyncValidationRules {
         .validate(gen.to(obj).head)
     }
 
-  def ruleField[M[_]: App, T, R <: HList, U](field: Witness, asyncPred: U => M[Boolean], whenInvalid: String)
-                                 (implicit ev: field.T <:< Symbol,
-                                  gen: LabelledGeneric.Aux[T, R],
-                                  sel: Selector.Aux[R, field.T, U])
-  : AsyncValidator[M, T] =
-    instance { (obj: T) =>
-      implicitly[App[M]].map(
-        rule[M, U](asyncPred, whenInvalid).validate(sel(gen.to(obj)))
-      )(errs => errs.map(FieldLabel(field.value) :: _))
-    }
-
-  def ruleCatchOnly[M[_]: App, T, E <: Throwable : ClassTag](asyncPred: T => M[Boolean],
+  def ruleCatchOnly[M[_]: App, T, E <: Throwable : ClassTag](asyncPred: T => Future[Boolean],
                                                   whenInvalid: String,
                                                   whenCaught: E => String): AsyncValidator[M, T] =
     instance { (obj: T) =>

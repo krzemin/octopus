@@ -1,11 +1,10 @@
 package octopus
 
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
-import shapeless.ops.record.Selector
+import shapeless.{::, Generic, HNil}
 
 import scala.reflect.ClassTag
-import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 object ValidationRules {
 
@@ -16,15 +15,6 @@ object ValidationRules {
                   (implicit gen: Generic.Aux[T, V :: HNil]): Validator[T] =
     (obj: T) => rule[V](pred, whenInvalid)
       .validate(gen.to(obj).head)
-
-  def ruleField[T, R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                 (implicit ev: field.T <:< Symbol,
-                                  gen: LabelledGeneric.Aux[T, R],
-                                  sel: Selector.Aux[R, field.T, U])
-  : Validator[T] =
-    (obj: T) => rule[U](pred, whenInvalid)
-      .validate(sel(gen.to(obj)))
-      .map(FieldLabel(field.value) :: _)
 
   def ruleCatchOnly[T, E <: Throwable : ClassTag](pred: T => Boolean,
                                                   whenInvalid: String,

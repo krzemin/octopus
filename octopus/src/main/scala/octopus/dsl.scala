@@ -1,7 +1,6 @@
 package octopus
 
-import shapeless.{::, Generic, HList, HNil, LabelledGeneric, Witness}
-import shapeless.ops.record.Selector
+import shapeless.{::, Generic, HNil}
 
 import scala.language.experimental.macros
 import scala.language.higherKinds
@@ -39,12 +38,6 @@ object dsl {
     def ruleVC[V](pred: V => Boolean, whenInvalid: String)
                  (implicit gen: Generic.Aux[T, V :: HNil]): Validator[T] =
       compose(ValidationRules.ruleVC(pred, whenInvalid))
-
-    def ruleField[R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): Validator[T] =
-      compose(ValidationRules.ruleField(field, pred, whenInvalid))
 
     def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean,
                                                  whenInvalid: String,
@@ -104,12 +97,6 @@ object dsl {
                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[M, T] =
       compose(AsyncValidationRules.ruleVC(asyncPred, whenInvalid))
 
-    def ruleField[R <: HList, U](field: Witness, asyncPred: U => M[Boolean], whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): AsyncValidator[M, T] =
-      compose(AsyncValidationRules.ruleField(field, asyncPred, whenInvalid))
-
     def ruleCatchOnly[E <: Throwable : ClassTag](asyncPred: T => M[Boolean],
                                                  whenInvalid: String,
                                                  whenCaught: E => String): AsyncValidator[M, T] =
@@ -167,12 +154,6 @@ object dsl {
     def ruleVC[V](pred: V => Boolean, whenInvalid: String)
                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleVC(pred, whenInvalid))
-
-    def ruleField[R <: HList, U](field: Witness, pred: U => Boolean, whenInvalid: String)
-                                (implicit ev: field.T <:< Symbol,
-                                 gen: LabelledGeneric.Aux[T, R],
-                                 sel: Selector.Aux[R, field.T, U]): AsyncValidator[M, T] =
-      compose(ValidationRules.ruleField(field, pred, whenInvalid))
 
     def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean,
                                                  whenInvalid: String,
