@@ -26,5 +26,5 @@ object AsyncValidator {
   def invalid[M[_]: App, T](error: String): AsyncValidator[M, T] =
     lift(Validator.invalid(error))
 
-  implicit def fromDerivedAsyncValidator[F[_], T](implicit dav: DerivedAsyncValidator[F, T]): AsyncValidator[F, T] = dav.av
+  implicit def fromDerived[F[_], T](implicit dav: DerivedAsyncValidator[F, T]): AsyncValidator[F, T] = dav.av
 }
