@@ -11,19 +11,22 @@ trait App[M[_]] {
   }
 }
 
-object App extends LowPriorityAppImplicits
+object App extends LowPriorityAppImplicits {
+  def apply[M[_]](implicit a: App[M]): App[M] = a
+}
 
 trait LowPriorityAppImplicits {
+
   implicit def futureApp(implicit ec: ExecutionContext): App[Future] = new App[Future] {
     override def pure[A](a: A): Future[A] = Future.successful(a)
 
     override def map2[A, B, C](first: Future[A], second: Future[B])(combine: (A, B) => C): Future[C] =
-      first.zipWith(second)(combine)
+      first.zipWith(second)(combine)(ec)
 
     override def recover[A, B <: A](app: Future[A], f: Throwable => B): Future[A] = {
       app.recover {
         case t: Throwable => f(t)
-      }
+      }(ec)
     }
   }
 }

@@ -11,7 +11,7 @@ object AsyncValidationRules {
 
   def rule[M[_]: App, T](asyncPred: T => M[Boolean], whenInvalid: String): AsyncValidator[M, T] =
     instance { (obj: T) =>
-      implicitly[App[M]].map(asyncPred(obj))(if(_) Nil else List(ValidationError(whenInvalid)))
+      App[M].map(asyncPred(obj))(if(_) Nil else List(ValidationError(whenInvalid)))
     }
 
   def ruleVC[M[_]: App, T, V](asyncPred: V => M[Boolean], whenInvalid: String)
@@ -21,7 +21,7 @@ object AsyncValidationRules {
         .validate(gen.to(obj).head)
     }
 
-  def ruleCatchOnly[M[_]: App, T, E <: Throwable : ClassTag](asyncPred: T => Future[Boolean],
+  def ruleCatchOnly[M[_]: App, T, E <: Throwable : ClassTag](asyncPred: T => M[Boolean],
                                                   whenInvalid: String,
                                                   whenCaught: E => String): AsyncValidator[M, T] =
     instance { (obj: T) =>
@@ -47,7 +47,7 @@ object AsyncValidationRules {
   def ruleEither[M[_]: App, T](asyncPred: T => M[Either[String, Boolean]],
                     whenInvalid: String): AsyncValidator[M, T] =
     instance { (obj: T) =>
-      implicitly[App[M]].map(asyncPred(obj)) {
+      App[M].map(asyncPred(obj)) {
         case Right(true) => Nil
         case Right(false) => List(ValidationError(whenInvalid))
         case Left(why) => List(ValidationError(why))
@@ -58,7 +58,7 @@ object AsyncValidationRules {
                     whenInvalid: String,
                     whenNone: String): AsyncValidator[M, T] =
     instance { (obj: T) =>
-      implicitly[App[M]].map(asyncPred(obj)) {
+      App[M].map(asyncPred(obj)) {
         case Some(true) => Nil
         case Some(false) => List(ValidationError(whenInvalid))
         case None => List(ValidationError(whenNone))

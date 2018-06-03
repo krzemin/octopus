@@ -16,7 +16,7 @@ object syntax {
   implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
 
     def validateAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[ValidationResult[T]] =
-      implicitly[App[M]].map(av.validate(obj)) { errors =>
+      App[M].map(av.validate(obj)) { errors =>
         new ValidationResult(obj, errors)
       }
 

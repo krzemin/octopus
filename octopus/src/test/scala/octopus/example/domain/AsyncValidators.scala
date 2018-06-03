@@ -2,24 +2,19 @@ package octopus.example.domain
 
 import octopus.dsl._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait EmailService {
-
   def isEmailTaken(email: String): Future[Boolean]
   def doesDomainExists(email: String): Future[Boolean]
 }
 
 trait GeoService {
-
   def doesPostalCodeExist(postalCode: PostalCode.T): Future[Boolean]
 }
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import octopus.App._
-
 class AsyncValidators(emailService: EmailService,
-                      geoService: GeoService) {
+                      geoService: GeoService)(implicit ec: ExecutionContext) {
 
   val Email_Err_AlreadyTaken = "email is already taken by someone else"
   val Email_Err_DomainDoesNotExists = "domain does not exists"
