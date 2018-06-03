@@ -21,7 +21,7 @@ object syntax {
       }
 
     def isValidAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[Boolean] =
-      implicitly[App[M]].map(validateAsync)(_.isValid)
+      App[M].map(validateAsync)(_.isValid)
   }
 
 }

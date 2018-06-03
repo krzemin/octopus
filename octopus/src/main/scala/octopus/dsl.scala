@@ -58,7 +58,6 @@ object dsl {
     def ruleOption(pred: T => Option[Boolean], whenInvalid: String, whenNone: String): Validator[T] =
       compose(ValidationRules.ruleOption(pred, whenInvalid, whenNone))
 
-
     def async[F[_]: App]: AsyncValidatorAsyncOps[F, T] =
       new AsyncValidatorAsyncOps[F, T](AsyncValidator.lift[F, T](v))
   }
@@ -67,14 +66,14 @@ object dsl {
 
     def compose(v2: AsyncValidator[M, T]): AsyncValidator[M, T] =
       AsyncValidator.instance[M, T] { (obj: T) =>
-        implicitly[App[M]].map2(v.validate(obj), v2.validate(obj)) {
+        App[M].map2(v.validate(obj), v2.validate(obj)) {
           case (e1, e2) => e1 ++ e2
         }
       }
 
     def composeSuper[U >: T](v2: AsyncValidator[M, U]): AsyncValidator[M, T] =
       AsyncValidator.instance { (obj: T) =>
-        implicitly[App[M]].map2(v.validate(obj), v2.validate(obj)) {
+        App[M].map2(v.validate(obj), v2.validate(obj)) {
           case (e1, e2) => e1 ++ e2
         }
       }
@@ -125,14 +124,14 @@ object dsl {
 
     def compose(v2: Validator[T]): AsyncValidator[M, T] =
       AsyncValidator.instance { (obj: T) =>
-        implicitly[App[M]].map(v.validate(obj)) {
+        App[M].map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }
 
     def composeSuper[U >: T](v2: Validator[U]): AsyncValidator[M, T] =
       AsyncValidator.instance { (obj: T) =>
-        implicitly[App[M]].map(v.validate(obj)) {
+        App[M].map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }
