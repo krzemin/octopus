@@ -96,19 +96,5 @@ class AsyncValidationSpec
       }
     }
 
-    "have invalid validator in the scope" should {
-      val Email_Err_ExternalCause = "External cause"
-      implicit val invalidValidator = AsyncValidator.invalid[Future, Email](Email_Err_ExternalCause)
-
-      "be invalid on valid case" in {
-        email_Valid.isValidAsync.map(_ mustBe false)
-        email_Valid.validateAsync.map(_.errors must contain (ValidationError(Email_Err_ExternalCause)))
-      }
-
-      "be invalid with predefined error on invalid case" in {
-        email_Invalid1.isValidAsync.map(_ mustBe false)
-        email_Invalid1.validateAsync.map(_.errors must contain (ValidationError(Email_Err_ExternalCause)))
-      }
-    }
   }
 }
