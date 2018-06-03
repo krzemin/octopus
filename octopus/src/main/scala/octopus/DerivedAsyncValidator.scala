@@ -9,31 +9,32 @@ class DerivedAsyncValidator[F[_], T](val av: AsyncValidator[F, T]) extends AnyVa
 
 object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
 
-  def apply[F[_], T](av: AsyncValidator[F, T]): DerivedAsyncValidator[F, T] = new DerivedAsyncValidator[F, T](av)
+  def apply[M[_]: App, T](av: AsyncValidator[M, T]): DerivedAsyncValidator[M, T] = new DerivedAsyncValidator[M, T](av)
 
-  implicit def hnilValidator[F[_]: App]: DerivedAsyncValidator[F, HNil] = DerivedAsyncValidator(AsyncValidator[F, HNil])
+  implicit def hnilValidator[M[_]: App]: DerivedAsyncValidator[M, HNil] = DerivedAsyncValidator(AsyncValidator[M, HNil])
 
-  implicit def hconsValidator[F[_], L <: Symbol, H, T <: HList]
+  implicit def hconsValidator[M[_]: App, L <: Symbol, H, T <: HList]
   (
     implicit
     label: Witness.Aux[L],
-    hv: Lazy[AsyncValidator[F, H]],
-    tv: DerivedAsyncValidator[F, T],
-    app: App[F]
-  ): DerivedAsyncValidator[F, FieldType[L, H] :: T] =
+    hv: Lazy[AsyncValidator[M, H]],
+    tv: DerivedAsyncValidator[M, T]
+  ): DerivedAsyncValidator[M, FieldType[L, H] :: T] =
     DerivedAsyncValidator {
       AsyncValidator.instance { (hlist: FieldType[L, H] :: T) =>
-        app.map2(
-          hv.value.validate(hlist.head),
+        App[M].map2(
+          App[M].map(hv.value.validate(hlist.head)){ errors =>
+            errors.map(FieldLabel(label.value) :: _)
+          },
           tv.av.validate(hlist.tail))(_ ++ _)
       }
     }
 
-  implicit def genValidator[F[_]: App, T, Repr](
+  implicit def genValidator[M[_]: App, T, Repr](
     implicit
     gen: LabelledGeneric.Aux[T, Repr],
-    dav: Lazy[DerivedAsyncValidator[F, Repr]]
-  ): DerivedAsyncValidator[F, T] =
+    dav: Lazy[DerivedAsyncValidator[M, Repr]]
+  ): DerivedAsyncValidator[M, T] =
     DerivedAsyncValidator {
       AsyncValidator.instance { (obj: T) =>
         dav.value.av.validate(gen.to(obj))
