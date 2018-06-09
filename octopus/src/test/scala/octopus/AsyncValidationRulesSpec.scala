@@ -28,6 +28,13 @@ class AsyncValidationRulesSpec
     case Email(address) if address == email_Valid_Long.address => Some(false)
     case _ => None
   }}
+  private def asyncValidateEmail(email: String): Future[Boolean] =
+    Future.successful (validateEmail(email))
+
+  private def  validateEmail(email: String): Boolean = email match {
+    case e if e == email_Valid.address => true
+    case _ => false
+  }
 
   private val User_validated_none_option = "Invalid user none option"
   private val User_Err_Invalid = "Invalid user"
@@ -58,6 +65,22 @@ class AsyncValidationRulesSpec
 
         user_Valid.isValidAsync.map(_ mustBe false)
         user_Valid.validateAsync.map(_.errors must contain (expectedValidationError))
+      }
+    }
+
+    "Working comap rule for asyncValidator async map" should {
+      val invalidEmail = "Email is invalid"
+      implicit val userEmailValidator = AsyncValidator[Future, String]
+        .async.rule(asyncValidateEmail, invalidEmail)
+        .comap[User](_.email.address)
+
+      "accept proper email" in {
+        user_Valid.isValidAsync.map(_ mustBe true)
+      }
+
+      "reject invalid users" in {
+        user_Invalid1.isValidAsync.map(_ mustBe false)
+        user_Invalid1.validateAsync.map(_.errors must contain (ValidationError(invalidEmail)))
       }
     }
 
