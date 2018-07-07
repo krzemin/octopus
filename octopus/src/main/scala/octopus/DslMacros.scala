@@ -47,10 +47,13 @@ private[octopus] object DslMacros {
           q"""
              {${c.prefix}}.compose {
                _root_.octopus.AsyncValidator.instance[$M, $T] { ($obj: $T) =>
-                 _root_.octopus.AsyncValidationRules
-                   .rule[$M, $F]($pred, $whenInvalid)
-                   .validate($selector($obj))
-                   .map(errs => errs.map(_root_.octopus.FieldLabel($fieldSymbol) :: _))
+                 _root_.octopus.App[$M].map(
+                  _root_.octopus.AsyncValidationRules
+                     .rule[$M, $F]($pred, $whenInvalid)
+                     .validate($selector($obj))
+                  ){ errs =>
+                     errs.map(_root_.octopus.FieldLabel($fieldSymbol) :: _)
+                  }
                }
              }
           """
