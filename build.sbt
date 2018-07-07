@@ -1,8 +1,8 @@
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
-  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
-  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
+  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS)
+  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS)
 
 lazy val versions = new {
   val scala = "2.12.6"
@@ -62,10 +62,27 @@ lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
   )
   .dependsOn(octopus % "compile->compile;test->test")
 
-
 lazy val octopusScalazJVM = octopusScalaz.jvm
 lazy val octopusScalazJS = octopusScalaz.js
 
+lazy val octopusScalazEffect = crossProject.crossType(CrossType.Pure)
+  .settings(
+    moduleName := "octopus-scalaz-effect", name := "octopus-scalaz-effect",
+    description := "Scalaz effect integration for Octopus validation library"
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(dependencies: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scalaz" %%% "scalaz-core" % versions.scalaz % "test,provided",
+      "org.scalaz" %%% "scalaz-effect" % versions.scalaz % "test,provided"
+    )
+  )
+  .dependsOn(octopus % "compile->compile;test->test")
+
+lazy val octopusScalazEffectJVM = octopusScalazEffect.jvm
+lazy val octopusScalazEffectJS = octopusScalazEffect.js
 
 lazy val coreSettings = commonSettings ++ publishSettings
 
