@@ -2,7 +2,6 @@ package octopus
 
 import _root_.scalaz.{NonEmptyList, Validation, ValidationNel}
 
-
 package object scalaz {
 
   implicit class OctopusScalazOps[T](val vr: ValidationResult[T]) extends AnyVal {
