@@ -1,10 +1,10 @@
 package octopus.scalaz
 
 import octopus.App
-import octopus.example.domain._
-import org.scalatest.{AsyncWordSpec, MustMatchers, WordSpec}
-import scalaz.effect.IO
 import octopus.async.scalaz._
+import octopus.example.domain._
+import org.scalatest.{AsyncWordSpec, MustMatchers}
+import scalaz.effect.IO
 
 import scala.concurrent.Future
 
