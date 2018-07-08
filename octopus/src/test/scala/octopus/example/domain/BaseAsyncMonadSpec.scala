@@ -41,5 +41,34 @@ trait BaseAsyncMonadSpec[M[_]] extends Fixtures with MustMatchers { this: AsyncW
     "rejected user errors should contain proper error massage" in {
       extractValueFrom(user_Invalid3.validateAsync).map(_.errors must contain (expectedValidationException))
     }
+
+    "also validate Async" in {
+      implicit val userValidator = octopus.Validator[User]
+      extractValueFrom(user_Invalid3
+        .validate
+        .alsoValidateAsync(userWithEmailValidator)).map(_.errors must contain (expectedValidationException))
+    }
+
+    "then validate async valid regular validator case" in {
+      implicit val userValidator = octopus.Validator[User]
+      extractValueFrom(user_Invalid3
+        .validate
+        .thenValidateAsync(userWithEmailValidator)).map(_.errors must contain (expectedValidationException))
+    }
+
+    "then validate async with invalid regular case" in {
+      val expectedValidationError = List(ValidationError(
+        message = "Onlu user with id 2 is allowed"
+      ))
+
+      implicit val userValidator = octopus.Validator[User]
+        .rule(_.id.id == 2, "Onlu user with id 2 is allowed")
+
+      extractValueFrom(
+        user_Invalid3
+          .validate
+          .thenValidateAsync(userWithEmailValidator)
+      ).map(_.errors must contain theSameElementsAs expectedValidationError)
+    }
   }
 }
