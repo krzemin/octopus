@@ -18,4 +18,8 @@ class ScalazIntegrationSpec
   "Scalaz Integration" should {
     behave like validateSimpleEmail(App[IO])
   }
+
+  "Validation result combined with base scala future async validation" should {
+    behave like validateResultWithAsyncValidator(App[IO])
+  }
 }

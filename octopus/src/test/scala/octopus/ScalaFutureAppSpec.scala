@@ -19,4 +19,8 @@ class ScalaFutureAppSpec
     behave like validateSimpleEmail(App[Future])
   }
 
+  "Validation result combined with base scala future async validation" should {
+    behave like validateResultWithAsyncValidator(App[Future])
+  }
+
 }
