@@ -89,7 +89,7 @@ object dsl {
     def rule(asyncPred: T => M[Boolean], whenInvalid: String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(AsyncValidationRules.rule(asyncPred, whenInvalid))
 
-    def rule[G](selector: T => G, pred: G => M[Boolean], whenInvalid: String)(implicit app: App[M]): AsyncValidator[M, T] =
+    def rule[G](selector: T => G, pred: G => M[Boolean], whenInvalid: String): AsyncValidator[M, T] =
       macro DslMacros.ruleFieldSelectorAsync[M, T, G]
 
     def ruleVC[V](asyncPred: V => M[Boolean], whenInvalid: String)
@@ -117,60 +117,60 @@ object dsl {
 
   }
 
-  implicit class AsyncValidatorSyncOps[M[_]: App, T](val v: AsyncValidator[M, T]) {
+  implicit class AsyncValidatorSyncOps[M[_], T](val v: AsyncValidator[M, T]) extends AnyVal {
 
     def async: AsyncValidatorAsyncOps[M, T] =
       new AsyncValidatorAsyncOps[M, T](v)
 
-    def compose(v2: Validator[T]): AsyncValidator[M, T] =
+    def compose(v2: Validator[T])(implicit app: App[M]): AsyncValidator[M, T] =
       AsyncValidator.instance { (obj: T) =>
         App[M].map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }
 
-    def composeSuper[U >: T](v2: Validator[U]): AsyncValidator[M, T] =
+    def composeSuper[U >: T](v2: Validator[U])(implicit app: App[M]): AsyncValidator[M, T] =
       AsyncValidator.instance { (obj: T) =>
         App[M].map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }
 
-    def composeDerived(implicit dv: DerivedValidator[T]): AsyncValidator[M, T] =
+    def composeDerived(implicit dv: DerivedValidator[T], app: App[M]): AsyncValidator[M, T] =
       compose(dv.v)
 
-    def comap[U](f: U => T): AsyncValidator[M, U] =
+    def comap[U](f: U => T)(implicit app: App[M]): AsyncValidator[M, U] =
       AsyncValidator.instance[M, U] { (value: U) =>
           v.validate(f(value))
       }
 
-    def rule(pred: T => Boolean, whenInvalid: String): AsyncValidator[M, T] =
+    def rule(pred: T => Boolean, whenInvalid: String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.rule(pred, whenInvalid))
 
     def rule[G](selector: T => G, pred: G => Boolean, whenInvalid: String): AsyncValidator[M, T] =
       macro DslMacros.ruleFieldSelectorSync[M, T, G]
 
     def ruleVC[V](pred: V => Boolean, whenInvalid: String)
-                 (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[M, T] =
+                 (implicit gen: Generic.Aux[T, V :: HNil], app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleVC(pred, whenInvalid))
 
     def ruleCatchOnly[E <: Throwable : ClassTag](pred: T => Boolean,
                                                  whenInvalid: String,
-                                                 whenCaught: E => String): AsyncValidator[M, T] =
+                                                 whenCaught: E => String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleCatchOnly(pred, whenInvalid, whenCaught))
 
     def ruleCatchNonFatal(pred: T => Boolean,
                           whenInvalid: String,
-                          whenCaught: Throwable => String): AsyncValidator[M, T] =
+                          whenCaught: Throwable => String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleCatchNonFatal(pred, whenInvalid, whenCaught))
 
     def ruleEither(pred: T => Either[String, Boolean],
-                   whenInvalid: String): AsyncValidator[M, T] =
+                   whenInvalid: String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleEither(pred, whenInvalid))
 
     def ruleOption(pred: T => Option[Boolean],
                    whenInvalid: String,
-                   whenNone: String): AsyncValidator[M, T] =
+                   whenNone: String)(implicit app: App[M]): AsyncValidator[M, T] =
       compose(ValidationRules.ruleOption(pred, whenInvalid, whenNone))
   }
 }

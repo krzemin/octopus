@@ -35,7 +35,7 @@ private[octopus] object DslMacros {
   def ruleFieldSelectorAsync[M[_], T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
                                                                 (selector: c.Expr[T => F],
                                                                  pred: c.Expr[F => M[Boolean]],
-                                                                 whenInvalid: c.Expr[String])(app: c.Expr[App[M]])(implicit M: c.WeakTypeTag[M[_]]): c.Expr[AsyncValidator[M, T]] = {
+                                                                 whenInvalid: c.Expr[String])(implicit M: c.WeakTypeTag[M[_]]): c.Expr[AsyncValidator[M, T]] = {
     import c.universe._
     selector.tree match {
       case q"($_) => $_.${fieldName: Name}" =>
