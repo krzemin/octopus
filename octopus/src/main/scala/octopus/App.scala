@@ -24,10 +24,8 @@ trait LowPriorityAppImplicits {
       // Reimplement to Future.zipWith after dropping scala 2.11 support
       first.zip(second).map(combine.tupled)
 
-    override def recover[A, B <: A](app: Future[A], f: Throwable => B): Future[A] = {
-      app.recover {
-        case t: Throwable => f(t)
-      }(ec)
+    override def recover[A, B <: A](app: Future[A], f: Throwable => B): Future[A] = app.recover {
+      case t: Throwable => f(t)
     }
   }
 }
