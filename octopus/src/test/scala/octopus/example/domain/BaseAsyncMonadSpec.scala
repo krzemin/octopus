@@ -20,7 +20,7 @@ trait BaseAsyncMonadSpec[M[_]] extends Fixtures with MustMatchers { this: AsyncW
 
   def validateSimpleEmail(implicit app: App[M]): Unit = {
 
-    val validateEmail: Email => M[Boolean] = (email: Email) => app.pure {
+    def validateEmail(email: Email): M[Boolean] = app.pure {
       email.address match {
         case e if e == email_Valid.address => true
         case _ => false
