@@ -1,8 +1,8 @@
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
-  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS)
-  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS)
+  .aggregate(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS, octopusCatsEffectJVM, octopusCatsEffectJS)
+  .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS, octopusScalazEffectJVM, octopusScalazEffectJS, octopusCatsEffectJVM, octopusCatsEffectJS)
 
 lazy val versions = new {
   val scala = "2.12.6"
@@ -10,6 +10,7 @@ lazy val versions = new {
   val shapeless = "2.3.3"
   val scalatest = "3.0.5"
   val cats = "1.1.0"
+  val catsEffect = "1.0.0-RC2"
   val scalaz = "7.2.22"
 }
 
@@ -46,8 +47,28 @@ lazy val octopusCats = crossProject.crossType(CrossType.Pure)
   .dependsOn(octopus % "compile->compile;test->test")
 
 
+
 lazy val octopusCatsJVM = octopusCats.jvm
 lazy val octopusCatsJS = octopusCats.js
+
+lazy val octopusCatsEffect = crossProject.crossType(CrossType.Pure)
+  .settings(
+    moduleName := "octopus-cats-effect", name := "octopus-cats-effect",
+    description := "Cats effect integration for Octopus validation library"
+  )
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(dependencies: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-core" % versions.cats % "test,provided",
+      "org.typelevel" %%% "cats-effect" % versions.catsEffect % "test, provided"
+    )
+  )
+  .dependsOn(octopus % "compile->compile;test->test")
+
+lazy val octopusCatsEffectJVM = octopusCatsEffect.jvm
+lazy val octopusCatsEffectJS = octopusCatsEffect.js
 
 lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
   .settings(
