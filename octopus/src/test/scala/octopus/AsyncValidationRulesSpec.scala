@@ -43,7 +43,7 @@ class AsyncValidationRulesSpec
   private val Email_Err_LeftCase = "Invalid email left case"
   private val Exception_HandledDuringValidation = "Exception handled during validation"
 
-  private val userValidator = Validator[User].async[Future]
+  private val userValidator = Validator[User].async
 
   "AsyncValidationRules" when {
 

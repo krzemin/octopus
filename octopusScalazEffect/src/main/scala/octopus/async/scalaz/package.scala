@@ -4,7 +4,6 @@ import _root_.scalaz.Scalaz._
 import _root_.scalaz.effect.IO
 import octopus.App
 
-
 package object scalaz {
 
   implicit val futureApp: App[IO] = new App[IO] {

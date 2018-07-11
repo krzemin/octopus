@@ -28,7 +28,7 @@ trait BaseAsyncMonadSpec[M[_]] extends Fixtures with MustMatchers { this: AsyncW
     }
 
     implicit val userWithEmailValidator: AsyncValidator[M, User] =
-      octopus.Validator[User].async[M].rule[Email](_.email, validateEmail, Exception_HandledDuringValidation)
+      octopus.Validator[User].asyncF[M].rule[Email](_.email, validateEmail, Exception_HandledDuringValidation)
 
     "accept user With valid email" in {
       extractValueFrom(user_Valid.isValidAsync).map(_ mustBe true)
@@ -53,7 +53,7 @@ trait BaseAsyncMonadSpec[M[_]] extends Fixtures with MustMatchers { this: AsyncW
       }
 
       implicit val userWithEmailValidator: AsyncValidator[M, User] =
-        octopus.Validator[User].async[M].rule[Email](_.email, validateEmail, Exception_HandledDuringValidation)
+        octopus.Validator[User].asyncF[M].rule[Email](_.email, validateEmail, Exception_HandledDuringValidation)
 
       "also validate Async" in {
         implicit val userValidator = octopus.Validator[User]

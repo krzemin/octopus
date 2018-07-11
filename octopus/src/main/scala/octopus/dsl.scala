@@ -2,6 +2,7 @@ package octopus
 
 import shapeless.{::, Generic, HNil}
 
+import scala.concurrent.Future
 import scala.language.experimental.macros
 import scala.language.higherKinds
 import scala.reflect.ClassTag
@@ -58,7 +59,10 @@ object dsl {
     def ruleOption(pred: T => Option[Boolean], whenInvalid: String, whenNone: String): Validator[T] =
       compose(ValidationRules.ruleOption(pred, whenInvalid, whenNone))
 
-    def async[F[_]: App]: AsyncValidatorAsyncOps[F, T] =
+    def async(implicit app: App[Future]): AsyncValidatorAsyncOps[Future, T] =
+      new AsyncValidatorAsyncOps[Future, T](AsyncValidator.lift[Future, T](v))
+
+    def asyncF[F[_]: App]: AsyncValidatorAsyncOps[F, T] =
       new AsyncValidatorAsyncOps[F, T](AsyncValidator.lift[F, T](v))
   }
 
