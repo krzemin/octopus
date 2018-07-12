@@ -2,7 +2,6 @@ package octopus.async.cats
 
 import cats.effect.IO
 import octopus.{App, AsyncValidationSpec}
-import octopus.example.domain._
 
 import scala.concurrent.Future
 

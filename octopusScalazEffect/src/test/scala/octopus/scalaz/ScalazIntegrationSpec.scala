@@ -1,7 +1,6 @@
 package octopus.scalaz
 
 import octopus.{App, AsyncValidationSpec}
-import octopus.example.domain._
 import scalaz.effect.IO
 
 import scala.concurrent.Future
