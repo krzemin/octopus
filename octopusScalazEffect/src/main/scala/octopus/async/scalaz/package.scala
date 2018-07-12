@@ -14,5 +14,7 @@ package object scalaz {
 
     override def recover[A, B <: A](app: IO[A], f: Throwable => B): IO[A] =
       app.except( t => IO(f(t)) )
+
+    override def map[A, B](fa: IO[A])(f: A => B): IO[B] = fa.map(f)
   }
 }

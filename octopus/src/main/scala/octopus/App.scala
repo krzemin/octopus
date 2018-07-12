@@ -6,9 +6,7 @@ trait App[M[_]] {
   def pure[A](a: A): M[A]
   def map2[A, B, C](first: M[A], second: M[B])(combine: (A, B) => C): M[C]
   def recover[A, B <: A](app: M[A], f: Throwable => B): M[A]
-  def map[A, B](fa: M[A])(f: A => B): M[B] = {
-    map2(fa, pure(true))((a, _) => f(a))
-  }
+  def map[A, B](fa: M[A])(f: A => B): M[B]
 }
 
 object App extends LowPriorityAppImplicits {
@@ -27,5 +25,7 @@ trait LowPriorityAppImplicits {
     override def recover[A, B <: A](app: Future[A], f: Throwable => B): Future[A] = app.recover {
       case t: Throwable => f(t)
     }
+
+    override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
   }
 }

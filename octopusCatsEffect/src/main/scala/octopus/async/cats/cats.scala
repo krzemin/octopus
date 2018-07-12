@@ -18,6 +18,8 @@ package object cats {
       app.recover {
         case a: Throwable => f(a)
       }
+
+    override def map[A, B](fa: IO[A])(f: A => B): IO[B] = fa.map(f)
   }
 }
 
