@@ -125,7 +125,7 @@ trait EmailService {
 
 class AsyncValidators(emailService: EmailService) {
 
-  implicit val emailAsyncValidator: AsyncValidator[Email] =
+  implicit val emailAsyncValidator: AsyncValidator[Future, Email] =
     Validator
       .derived[Email] // (1)
       .async.ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
@@ -160,6 +160,33 @@ Comments:
 * (3) we are adding next asynchronous validation rule
 * (4) we are importing instances for asynchronous validators into current scope
   so that later we can use `.isValidAsync`/`.validateAsync` extension methods.
+
+#### Another asynchronous monad
+
+At the time there exists possibility to use cats.IO or scalaz.IO monad for asynchronous validation rules.
+First of all proper dependency is required
+```
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz-effect" % "0.3.3"
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats-effect" % "0.3.3"
+```
+Then with propper import `asyncF` method on Validator gives user the possibility to specify target monad:
+```scala
+  import octopus.async.cats._ // octopus.async.scalaz._
+  import cats.effect.IO
+
+  trait EmailService {
+    def isEmailTaken(email: String): IO[Boolean]
+    def doesDomainExists(email: String): IO[Boolean]
+  }
+
+  implicit val emailAsyncValidator: AsyncValidator[IO, Email] =
+    Validator
+      .derived[Email]
+      .asyncF[IO].ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
+      .async.rule(_.address, emailService.doesDomainExists, "domain does not exists") // (3)
+
+  Email("abc@xyz.qux").isValidAsync // IO(false): IO[Boolean]
+```
 
 
 ### Integration with Cats / Scalaz
