@@ -70,7 +70,7 @@ class AsyncValidationRulesSpec
 
     "Working comap rule for asyncValidator async map" should {
       val invalidEmail = "Email is invalid"
-      implicit val userEmailValidator = AsyncValidator[Future, String]
+      implicit val userEmailValidator = AsyncValidatorM[Future, String]
         .async.rule(asyncValidateEmail, invalidEmail)
         .comap[User](_.email.address)
 

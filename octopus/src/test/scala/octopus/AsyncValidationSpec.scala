@@ -3,7 +3,7 @@ package octopus
 import octopus.dsl._
 import octopus.example.domain._
 import octopus.syntax._
-import octopus.{AsyncValidator => _}
+import octopus.{AsyncValidatorM => _}
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
 
   def extractValueFrom[A](mval: M[A]): Future[A]
 
-  implicit def app: App[M]
+  implicit def app: AppError[M]
 
 
   "AsyncValidation scoping" when {
@@ -85,9 +85,9 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
     }
 
     def validateEmailF(email: Email): M[Boolean] =
-      App[M].pure(validateEmail(email))
+      AppError[M].pure(validateEmail(email))
 
-    implicit val userWithEmailValidator: AsyncValidator[M, User] =
+    implicit val userWithEmailValidator: AsyncValidatorM[M, User] =
       octopus.Validator[User].asyncF[M].rule[Email](_.email, validateEmailF, Exception_HandledDuringValidation)
 
     "don't have explicit async validator in scope" should {
@@ -106,7 +106,7 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
 
     "have invalid validator in the scope" should {
       val Email_Err_ExternalCause = "External cause"
-      implicit val invalidValidator = AsyncValidator.invalid[M, Email](Email_Err_ExternalCause)
+      implicit val invalidValidator = AsyncValidatorM.invalid[M, Email](Email_Err_ExternalCause)
 
       "be invalid on valid case" in {
         extractValueFrom(email_Valid.isValidAsync).map(_ mustBe false)

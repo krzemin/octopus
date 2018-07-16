@@ -2,11 +2,11 @@ package octopus.async
 
 import _root_.scalaz.Scalaz._
 import _root_.scalaz.effect.IO
-import octopus.App
+import octopus.AppError
 
 package object scalaz {
 
-  implicit val scalazIO: App[IO] = new App[IO] {
+  implicit val scalazIOAppError: AppError[IO] = new AppError[IO] {
     override def pure[A](a: A): IO[A] = IO(a)
 
     override def map2[A, B, C](first: IO[A], second: IO[B])(combine: (A, B) => C): IO[C] =

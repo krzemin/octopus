@@ -15,13 +15,13 @@ object syntax {
 
   implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
 
-    def validateAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[ValidationResult[T]] =
-      App[M].map(av.validate(obj)) { errors =>
+    def validateAsync[M[_]: AppError](implicit av: AsyncValidatorM[M, T]): M[ValidationResult[T]] =
+      AppError[M].map(av.validate(obj)) { errors =>
         new ValidationResult(obj, errors)
       }
 
-    def isValidAsync[M[_]: App](implicit av: AsyncValidator[M, T]): M[Boolean] =
-      App[M].map(validateAsync)(_.isValid)
+    def isValidAsync[M[_]: AppError](implicit av: AsyncValidatorM[M, T]): M[Boolean] =
+      AppError[M].map(validateAsync)(_.isValid)
   }
 
 }

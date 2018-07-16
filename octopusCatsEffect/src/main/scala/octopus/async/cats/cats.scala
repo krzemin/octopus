@@ -4,11 +4,11 @@ import _root_.cats.effect.IO
 import _root_.cats.implicits._
 import _root_.cats.Applicative
 
-import octopus.App
+import octopus.AppError
 
 package object cats {
 
-  implicit val catsIO: App[IO] = new App[IO] {
+  implicit val catsIOAppError: AppError[IO] = new AppError[IO] {
     override def pure[A](a: A): IO[A] = IO(a)
 
     override def map2[A, B, C](first: IO[A], second: IO[B])(combine: (A, B) => C): IO[C] =

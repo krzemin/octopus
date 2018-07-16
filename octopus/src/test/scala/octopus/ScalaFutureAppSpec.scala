@@ -7,5 +7,5 @@ class ScalaFutureAppSpec
 
   override def extractValueFrom[A](mval: Future[A]): Future[A] = mval
 
-  override implicit def app: App[Future] = App.futureApp(executionContext)
+  override implicit def app: AppError[Future] = AppError.futureAppError(executionContext)
 }

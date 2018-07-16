@@ -2,29 +2,29 @@ package octopus
 
 import scala.language.higherKinds
 
-trait AsyncValidator[M[_], T] {
-  def validate(obj: T)(implicit app: App[M]): M[List[ValidationError]]
+trait AsyncValidatorM[M[_], T] {
+  def validate(obj: T)(implicit appError: AppError[M]): M[List[ValidationError]]
 }
 
-object AsyncValidator {
+object AsyncValidatorM {
 
-  def instance[M[_], T](f: T => M[List[ValidationError]]): AsyncValidator[M, T] = {
-    new AsyncValidator[M, T] {
-      def validate(obj: T)(implicit app: App[M]): M[List[ValidationError]] =
+  def instance[M[_], T](f: T => M[List[ValidationError]]): AsyncValidatorM[M, T] = {
+    new AsyncValidatorM[M, T] {
+      def validate(obj: T)(implicit appError: AppError[M]): M[List[ValidationError]] =
         f(obj)
     }
   }
 
-  def lift[M[_]: App, T](v: Validator[T]): AsyncValidator[M, T] =
+  def lift[M[_]: AppError, T](v: Validator[T]): AsyncValidatorM[M, T] =
     instance { obj =>
-      App[M].pure(v.validate(obj))
+      AppError[M].pure(v.validate(obj))
     }
 
-  def apply[M[_]: App, T]: AsyncValidator[M, T] =
+  def apply[M[_]: AppError, T]: AsyncValidatorM[M, T] =
     lift(Validator.apply[T])
 
-  def invalid[M[_]: App, T](error: String): AsyncValidator[M, T] =
+  def invalid[M[_]: AppError, T](error: String): AsyncValidatorM[M, T] =
     lift(Validator.invalid(error))
 
-  implicit def fromDerived[F[_], T](implicit dav: DerivedAsyncValidator[F, T]): AsyncValidator[F, T] = dav.av
+  implicit def fromDerived[F[_], T](implicit dav: DerivedAsyncValidator[F, T]): AsyncValidatorM[F, T] = dav.av
 }

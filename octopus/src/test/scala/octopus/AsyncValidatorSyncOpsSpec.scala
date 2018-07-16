@@ -9,17 +9,17 @@ import org.scalatest.{AsyncWordSpec, MustMatchers}
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class AsyncValidatorSyncOpsSpec
+class AsyncValidatorMSyncOpsSpec
   extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
   with MustMatchers {
 
 
-  "AsyncValidatorSyncOps" when {
+  "AsyncValidatorMSyncOps" when {
 
     "basic validation" should {
-      implicit val v = AsyncValidator[Future, User]
+      implicit val v = AsyncValidatorM[Future, User]
         .rule(_.email == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -32,7 +32,7 @@ class AsyncValidatorSyncOpsSpec
     }
 
     "validation with mapping" should {
-      implicit val v = AsyncValidator[Future, User]
+      implicit val v = AsyncValidatorM[Future, User]
         .rule(_.email, (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -45,7 +45,7 @@ class AsyncValidatorSyncOpsSpec
     }
 
     "validate field" should {
-      implicit val v = AsyncValidator[Future, User]
+      implicit val v = AsyncValidatorM[Future, User]
         .rule(_.email,  (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -58,7 +58,7 @@ class AsyncValidatorSyncOpsSpec
     }
 
     "validate with option case" should {
-      implicit val v = AsyncValidator[Future, User]
+      implicit val v = AsyncValidatorM[Future, User]
         .ruleOption(
           _.email.address.headOption.map(_ == 'x'),
           "Email doesn't start with x",
@@ -92,7 +92,7 @@ class AsyncValidatorSyncOpsSpec
         }
       }
       val invalidMessage = "String value is not > 10"
-      implicit val v = AsyncValidator[Future, Age]
+      implicit val v = AsyncValidatorM[Future, Age]
         .ruleEither(a => stringValueGT10(a.value), invalidMessage)
 
       "detect value >10" in {
@@ -129,7 +129,7 @@ class AsyncValidatorSyncOpsSpec
 
       val invalidMessage = "Value passed was not greater then 5"
 
-      implicit val v = AsyncValidator[Future, Age]
+      implicit val v = AsyncValidatorM[Future, Age]
         .ruleCatchOnly[NumberFormatException](
           a => throwingStringIntValue(a.value),
           invalidMessage,

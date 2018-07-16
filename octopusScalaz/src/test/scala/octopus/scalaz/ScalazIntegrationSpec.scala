@@ -4,7 +4,6 @@ import octopus.example.domain._
 import octopus.syntax._
 import octopus.{Fixtures, ValidationError}
 import org.scalatest.{MustMatchers, WordSpec}
-
 import scalaz.{NonEmptyList, Validation}
 
 
