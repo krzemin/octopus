@@ -16,6 +16,8 @@ object dsl {
   type AsyncValidatorM[M[_], T] = octopus.AsyncValidatorM[M, T]
   val AsyncValidatorM = octopus.AsyncValidatorM
 
+  type AsyncValidator[T] = octopus.AsyncValidatorM[Future, T]
+
   implicit class ValidatorOps[T](val v: Validator[T]) extends AnyVal {
 
     def compose(v2: Validator[T]): Validator[T] =

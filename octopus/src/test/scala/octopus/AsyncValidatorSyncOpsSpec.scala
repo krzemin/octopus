@@ -19,7 +19,7 @@ class AsyncValidatorMSyncOpsSpec
   "AsyncValidatorMSyncOps" when {
 
     "basic validation" should {
-      implicit val v = AsyncValidatorM[Future, User]
+      implicit val v = AsyncValidator[User]
         .rule(_.email == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -32,7 +32,7 @@ class AsyncValidatorMSyncOpsSpec
     }
 
     "validation with mapping" should {
-      implicit val v = AsyncValidatorM[Future, User]
+      implicit val v = AsyncValidator[User]
         .rule(_.email, (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -45,7 +45,7 @@ class AsyncValidatorMSyncOpsSpec
     }
 
     "validate field" should {
-      implicit val v = AsyncValidatorM[Future, User]
+      implicit val v = AsyncValidator[User]
         .rule(_.email,  (_: Email) == email_Valid, "Invalid email")
 
       "accept on proper value" in {
@@ -58,7 +58,7 @@ class AsyncValidatorMSyncOpsSpec
     }
 
     "validate with option case" should {
-      implicit val v = AsyncValidatorM[Future, User]
+      implicit val v = AsyncValidator[User]
         .ruleOption(
           _.email.address.headOption.map(_ == 'x'),
           "Email doesn't start with x",
@@ -92,7 +92,7 @@ class AsyncValidatorMSyncOpsSpec
         }
       }
       val invalidMessage = "String value is not > 10"
-      implicit val v = AsyncValidatorM[Future, Age]
+      implicit val v = AsyncValidator[Age]
         .ruleEither(a => stringValueGT10(a.value), invalidMessage)
 
       "detect value >10" in {
@@ -129,7 +129,7 @@ class AsyncValidatorMSyncOpsSpec
 
       val invalidMessage = "Value passed was not greater then 5"
 
-      implicit val v = AsyncValidatorM[Future, Age]
+      implicit val v = AsyncValidator[Age]
         .ruleCatchOnly[NumberFormatException](
           a => throwingStringIntValue(a.value),
           invalidMessage,
