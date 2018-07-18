@@ -17,6 +17,7 @@ object dsl {
   val AsyncValidatorM = octopus.AsyncValidatorM
 
   type AsyncValidator[T] = octopus.AsyncValidatorM[Future, T]
+  val AsyncValidator = octopus.AsyncValidator
 
   implicit class ValidatorOps[T](val v: Validator[T]) extends AnyVal {
 

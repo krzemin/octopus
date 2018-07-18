@@ -6,7 +6,6 @@ import octopus.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 class AsyncValidatorMSyncOpsSpec
