@@ -1,6 +1,12 @@
 package octopus
 
+import scala.concurrent.Future
 import scala.language.higherKinds
+
+private[octopus] object AsyncValidator {
+  def apply[T](implicit appError: AppError[Future]): octopus.dsl.AsyncValidator[T] =
+    AsyncValidatorM.lift[Future, T](Validator.apply[T])
+}
 
 trait AsyncValidatorM[M[_], T] {
   def validate(obj: T)(implicit appError: AppError[M]): M[List[ValidationError]]

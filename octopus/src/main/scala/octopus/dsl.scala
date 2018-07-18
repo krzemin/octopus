@@ -1,6 +1,5 @@
 package octopus
 
-import octopus.dsl.AsyncValidator
 import shapeless.{::, Generic, HNil}
 
 import scala.concurrent.Future
@@ -8,11 +7,6 @@ import scala.language.experimental.macros
 import scala.language.higherKinds
 import scala.reflect.ClassTag
 import scala.util.Try
-
-object AsyncValidator {
-  def apply[T](implicit appError: AppError[Future]): AsyncValidator[T] =
-    AsyncValidatorM.lift[Future, T](Validator.apply[T])
-}
 
 object dsl {
 
