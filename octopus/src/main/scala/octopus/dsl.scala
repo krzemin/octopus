@@ -73,14 +73,14 @@ object dsl {
 
     def compose(v2: AsyncValidatorM[M, T])(implicit appError: AppError[M]): AsyncValidatorM[M, T] =
       AsyncValidatorM.instance[M, T] { (obj: T) =>
-        AppError[M].map2(v.validate(obj), v2.validate(obj)) {
+        appError.map2(v.validate(obj), v2.validate(obj)) {
           case (e1, e2) => e1 ++ e2
         }
       }
 
     def composeSuper[U >: T](v2: AsyncValidatorM[M, U])(implicit appError: AppError[M]): AsyncValidatorM[M, T] =
       AsyncValidatorM.instance { (obj: T) =>
-        AppError[M].map2(v.validate(obj), v2.validate(obj)) {
+        appError.map2(v.validate(obj), v2.validate(obj)) {
           case (e1, e2) => e1 ++ e2
         }
       }
@@ -131,14 +131,14 @@ object dsl {
 
     def compose(v2: Validator[T])(implicit appError: AppError[M]): AsyncValidatorM[M, T] =
       AsyncValidatorM.instance { (obj: T) =>
-        AppError[M].map(v.validate(obj)) {
+        appError.map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }
 
     def composeSuper[U >: T](v2: Validator[U])(implicit appError: AppError[M]): AsyncValidatorM[M, T] =
       AsyncValidatorM.instance { (obj: T) =>
-        AppError[M].map(v.validate(obj)) {
+        appError.map(v.validate(obj)) {
           _ ++ v2.validate(obj)
         }
       }

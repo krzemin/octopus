@@ -25,7 +25,7 @@ object AsyncValidationRules {
                                                   whenInvalid: String,
                                                   whenCaught: E => String): AsyncValidatorM[M, T] =
     instance { (obj: T) =>
-      implicitly[AppError[M]].recover(
+      AppError[M].recover(
         rule(asyncPred, whenInvalid).validate(obj), {
           case ex if implicitly[ClassTag[E]].runtimeClass.isInstance(ex) =>
             List(ValidationError(whenCaught(ex.asInstanceOf[E])))
@@ -37,7 +37,7 @@ object AsyncValidationRules {
                            whenInvalid: String,
                            whenCaught: Throwable => String): AsyncValidatorM[M, T] =
     instance { (obj: T) =>
-      implicitly[AppError[M]].recover(
+      AppError[M].recover(
         rule(asyncPred, whenInvalid).validate(obj), {
           case NonFatal(ex) =>
             List(ValidationError(whenCaught(ex)))

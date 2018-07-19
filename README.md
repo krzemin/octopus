@@ -169,7 +169,7 @@ First of all proper dependency is required
 libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz-effect" % "0.3.3"
 libraryDependencies += "com.github.krzemin" %%% "octopus-cats-effect" % "0.3.3"
 ```
-Then with propper import `asyncF` method on Validator gives user the possibility to specify target monad:
+Then with propper import `asyncM` method on Validator gives user the possibility to specify target monad:
 ```scala
   import octopus.async.cats._ // octopus.async.scalaz._
   import cats.effect.IO
@@ -179,10 +179,10 @@ Then with propper import `asyncF` method on Validator gives user the possibility
     def doesDomainExists(email: String): IO[Boolean]
   }
 
-  implicit val emailAsyncValidator: AsyncValidator[IO, Email] =
+  implicit val emailAsyncValidator: AsyncValidatorM[IO, Email] =
     Validator
       .derived[Email]
-      .asyncF[IO].ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
+      .asyncM[IO].ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
       .async.rule(_.address, emailService.doesDomainExists, "domain does not exists") // (3)
 
   Email("abc@xyz.qux").isValidAsync // IO(false): IO[Boolean]
