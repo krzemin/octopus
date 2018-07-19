@@ -65,7 +65,7 @@ object dsl {
     def async(implicit appError: AppError[Future]): AsyncValidatorAsyncOps[Future, T] =
       new AsyncValidatorAsyncOps[Future, T](AsyncValidatorM.lift[Future, T](v))
 
-    def asyncF[F[_]: AppError]: AsyncValidatorAsyncOps[F, T] =
+    def asyncM[F[_]: AppError]: AsyncValidatorAsyncOps[F, T] =
       new AsyncValidatorAsyncOps[F, T](AsyncValidatorM.lift[F, T](v))
   }
 

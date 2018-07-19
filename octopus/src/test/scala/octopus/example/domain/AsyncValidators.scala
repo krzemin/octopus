@@ -21,7 +21,7 @@ class AsyncValidators[M[_]: AppError](emailService: EmailService[M],
   implicit val emailAsyncValidator: AsyncValidatorM[M, Email] =
     Validator
       .derived[Email]
-      .asyncF[M].ruleVC(emailService.isEmailTaken, Email_Err_AlreadyTaken)
+      .asyncM[M].ruleVC(emailService.isEmailTaken, Email_Err_AlreadyTaken)
       .async.rule(_.address, emailService.doesDomainExists, Email_Err_DomainDoesNotExists)
       .rule(_.address, (_: String).nonEmpty, Email.Err_MustNotBeEmpty)
       // repeated to check dsl behavior & to ensure that it keep the validator in the asynchronous world

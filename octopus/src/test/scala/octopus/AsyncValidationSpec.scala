@@ -88,7 +88,7 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
       AppError[M].pure(validateEmail(email))
 
     implicit val userWithEmailValidator: AsyncValidatorM[M, User] =
-      octopus.Validator[User].asyncF[M].rule[Email](_.email, validateEmailF, Exception_HandledDuringValidation)
+      octopus.Validator[User].asyncM[M].rule[Email](_.email, validateEmailF, Exception_HandledDuringValidation)
 
     "don't have explicit async validator in scope" should {
 
