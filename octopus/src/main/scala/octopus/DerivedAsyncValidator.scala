@@ -5,7 +5,7 @@ import shapeless.{::, HList, HNil, LabelledGeneric, Lazy, Witness}
 
 import scala.language.higherKinds
 
-class DerivedAsyncValidator[F[_], T](val av: AsyncValidatorM[F, T]) extends AnyVal
+class DerivedAsyncValidator[M[_], T](val av: AsyncValidatorM[M, T]) extends AnyVal
 
 object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
 
@@ -44,6 +44,6 @@ object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
 
 trait LowPriorityAsyncValidatorDerivation {
 
-  implicit def fromSyncValidator[F[_]: AppError, T](implicit v: Validator[T]): DerivedAsyncValidator[F, T] =
+  implicit def fromSyncValidator[M[_]: AppError, T](implicit v: Validator[T]): DerivedAsyncValidator[M, T] =
     DerivedAsyncValidator(AsyncValidatorM.lift(v))
 }

@@ -15,7 +15,7 @@ sealed class ValidationResult[T](private[octopus] val value: T, val errors: List
     new ValidationResult(value, errors ++ validator.validate(value))
 
   def alsoValidateAsync[M[_]: AppError](asyncValidator: AsyncValidatorM[M, T]): M[ValidationResult[T]] =
-    implicitly[AppError[M]].map(asyncValidator.validate(value)) { asyncErrors =>
+    AppError[M].map(asyncValidator.validate(value)) { asyncErrors =>
       new ValidationResult(value, errors ++ asyncErrors)
     }
 
@@ -26,7 +26,7 @@ sealed class ValidationResult[T](private[octopus] val value: T, val errors: List
     if(isValid) alsoValidate(validator) else this
 
   def thenValidateAsync[M[_]: AppError](asyncValidator: AsyncValidatorM[M, T]): M[ValidationResult[T]] =
-    if(isValid) alsoValidateAsync(asyncValidator) else implicitly[AppError[M]].pure(this)
+    if(isValid) alsoValidateAsync(asyncValidator) else AppError[M].pure(this)
 
   def isValid: Boolean =
     errors.isEmpty

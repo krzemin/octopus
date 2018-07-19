@@ -65,8 +65,8 @@ object dsl {
     def async(implicit appError: AppError[Future]): AsyncValidatorAsyncOps[Future, T] =
       new AsyncValidatorAsyncOps[Future, T](AsyncValidatorM.lift[Future, T](v))
 
-    def asyncM[F[_]: AppError]: AsyncValidatorAsyncOps[F, T] =
-      new AsyncValidatorAsyncOps[F, T](AsyncValidatorM.lift[F, T](v))
+    def asyncM[M[_]: AppError]: AsyncValidatorAsyncOps[M, T] =
+      new AsyncValidatorAsyncOps[M, T](AsyncValidatorM.lift[M, T](v))
   }
 
   class AsyncValidatorAsyncOps[M[_], T](val v: AsyncValidatorM[M, T]) extends AnyVal {
@@ -143,7 +143,7 @@ object dsl {
         }
       }
 
-    def composeDerived(implicit dv: DerivedValidator[T], app: AppError[M]): AsyncValidatorM[M, T] =
+    def composeDerived(implicit dv: DerivedValidator[T], appError: AppError[M]): AsyncValidatorM[M, T] =
       compose(dv.v)
 
     def comap[U](f: U => T)(implicit appError: AppError[M]): AsyncValidatorM[M, U] =
