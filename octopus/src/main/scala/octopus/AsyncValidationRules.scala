@@ -1,70 +1,67 @@
 package octopus
 
-import octopus.AsyncValidator.instance
+import octopus.AsyncValidatorM.instance
 import shapeless.{::, Generic, HNil}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.language.higherKinds
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 object AsyncValidationRules {
 
-  def rule[T](asyncPred: T => Future[Boolean], whenInvalid: String): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      asyncPred(obj).map {
-        if (_) Nil else List(ValidationError(whenInvalid))
-      }(ec)
+  def rule[M[_]: AppError, T](asyncPred: T => M[Boolean], whenInvalid: String): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      AppError[M].map(asyncPred(obj))(if(_) Nil else List(ValidationError(whenInvalid)))
     }
 
-  def ruleVC[T, V](asyncPred: V => Future[Boolean], whenInvalid: String)
-                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      rule[V](asyncPred, whenInvalid)
-        .validate(gen.to(obj).head)(ec)
+  def ruleVC[M[_]: AppError, T, V](asyncPred: V => M[Boolean], whenInvalid: String)
+                  (implicit gen: Generic.Aux[T, V :: HNil]): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      rule[M, V](asyncPred, whenInvalid)
+        .validate(gen.to(obj).head)
     }
 
-  def ruleCatchOnly[T, E <: Throwable : ClassTag](asyncPred: T => Future[Boolean],
+  def ruleCatchOnly[M[_]: AppError, T, E <: Throwable : ClassTag](asyncPred: T => M[Boolean],
                                                   whenInvalid: String,
-                                                  whenCaught: E => String): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      rule(asyncPred, whenInvalid)
-        .validate(obj)(ec)
-        .recover {
+                                                  whenCaught: E => String): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      AppError[M].recover(
+        rule(asyncPred, whenInvalid).validate(obj), {
           case ex if implicitly[ClassTag[E]].runtimeClass.isInstance(ex) =>
             List(ValidationError(whenCaught(ex.asInstanceOf[E])))
-        }(ec)
+        }
+      )
     }
 
-  def ruleCatchNonFatal[T](asyncPred: T => Future[Boolean],
+  def ruleCatchNonFatal[M[_]: AppError, T](asyncPred: T => M[Boolean],
                            whenInvalid: String,
-                           whenCaught: Throwable => String): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      rule(asyncPred, whenInvalid)
-        .validate(obj)(ec)
-        .recover {
+                           whenCaught: Throwable => String): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      AppError[M].recover(
+        rule(asyncPred, whenInvalid).validate(obj), {
           case NonFatal(ex) =>
             List(ValidationError(whenCaught(ex)))
-        }(ec)
+        })
     }
 
-  def ruleEither[T](asyncPred: T => Future[Either[String, Boolean]],
-                    whenInvalid: String): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      asyncPred(obj).map {
+  def ruleEither[M[_]: AppError, T](asyncPred: T => M[Either[String, Boolean]],
+                    whenInvalid: String): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      AppError[M].map(asyncPred(obj)) {
         case Right(true) => Nil
         case Right(false) => List(ValidationError(whenInvalid))
         case Left(why) => List(ValidationError(why))
-      }(ec)
+      }
     }
 
-  def ruleOption[T](asyncPred: T => Future[Option[Boolean]],
+  def ruleOption[M[_]: AppError, T](asyncPred: T => M[Option[Boolean]],
                     whenInvalid: String,
-                    whenNone: String): AsyncValidator[T] =
-    instance { (obj: T, ec: ExecutionContext) =>
-      asyncPred(obj).map {
+                    whenNone: String): AsyncValidatorM[M, T] =
+    instance { (obj: T) =>
+      AppError[M].map(asyncPred(obj)) {
         case Some(true) => Nil
         case Some(false) => List(ValidationError(whenInvalid))
         case None => List(ValidationError(whenNone))
-      }(ec)
+      }
     }
 }

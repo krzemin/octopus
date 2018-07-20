@@ -8,13 +8,14 @@ import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.util.{Failure, Success, Try}
 
-class AsyncValidatorSyncOpsSpec
+class AsyncValidatorMSyncOpsSpec
   extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
   with MustMatchers {
 
-  "AsyncValidatorSyncOps" when {
+
+  "AsyncValidatorMSyncOps" when {
 
     "basic validation" should {
       implicit val v = AsyncValidator[User]

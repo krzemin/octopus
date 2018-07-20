@@ -3,7 +3,7 @@ package octopus
 import shapeless.tag
 import shapeless.tag.@@
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.language.higherKinds
 
 
 sealed class ValidationResult[T](private[octopus] val value: T, val errors: List[ValidationError]) {
@@ -14,9 +14,8 @@ sealed class ValidationResult[T](private[octopus] val value: T, val errors: List
   def alsoValidate(validator: Validator[T]): ValidationResult[T] =
     new ValidationResult(value, errors ++ validator.validate(value))
 
-  def alsoValidateAsync(asyncValidator: AsyncValidator[T])
-                       (implicit ec: ExecutionContext): Future[ValidationResult[T]] =
-    asyncValidator.validate(value).map { asyncErrors =>
+  def alsoValidateAsync[M[_]: AppError](asyncValidator: AsyncValidatorM[M, T]): M[ValidationResult[T]] =
+    AppError[M].map(asyncValidator.validate(value)) { asyncErrors =>
       new ValidationResult(value, errors ++ asyncErrors)
     }
 
@@ -26,9 +25,8 @@ sealed class ValidationResult[T](private[octopus] val value: T, val errors: List
   def thenValidate(validator: Validator[T]): ValidationResult[T] =
     if(isValid) alsoValidate(validator) else this
 
-  def thenValidateAsync(asyncValidator: AsyncValidator[T])
-                       (implicit ec: ExecutionContext): Future[ValidationResult[T]] =
-    if(isValid) alsoValidateAsync(asyncValidator) else Future.successful(this)
+  def thenValidateAsync[M[_]: AppError](asyncValidator: AsyncValidatorM[M, T]): M[ValidationResult[T]] =
+    if(isValid) alsoValidateAsync(asyncValidator) else AppError[M].pure(this)
 
   def isValid: Boolean =
     errors.isEmpty
