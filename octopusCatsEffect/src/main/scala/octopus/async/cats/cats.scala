@@ -14,8 +14,8 @@ package object cats {
     def map2[A, B, C](first: IO[A], second: IO[B])(combine: (A, B) => C): IO[C] =
       Applicative[IO].map2(first, second)(combine)
 
-    def recover[A, B <: A](app: IO[A], f: Throwable => B): IO[A] =
-      app.recover {
+    def recover[A, B <: A](io: IO[A], f: Throwable => B): IO[A] =
+      io.recover {
         case a: Throwable => f(a)
       }
 

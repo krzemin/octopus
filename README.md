@@ -125,7 +125,7 @@ trait EmailService {
 
 class AsyncValidators(emailService: EmailService) {
 
-  implicit val emailAsyncValidator: AsyncValidator[Future, Email] =
+  implicit val emailAsyncValidator: AsyncValidator[Email] =
     Validator
       .derived[Email] // (1)
       .async.ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)

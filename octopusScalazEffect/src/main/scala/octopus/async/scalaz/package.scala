@@ -12,8 +12,8 @@ package object scalaz {
     def map2[A, B, C](first: IO[A], second: IO[B])(combine: (A, B) => C): IO[C] =
       (first |@| second)(combine)
 
-    def recover[A, B <: A](app: IO[A], f: Throwable => B): IO[A] =
-      app.except( t => IO(f(t)) )
+    def recover[A, B <: A](io: IO[A], f: Throwable => B): IO[A] =
+      io.except( t => IO(f(t)) )
 
     def map[A, B](fa: IO[A])(f: A => B): IO[B] = fa.map(f)
   }
