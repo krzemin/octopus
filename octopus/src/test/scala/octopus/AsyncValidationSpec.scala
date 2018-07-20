@@ -8,12 +8,13 @@ import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.concurrent.Future
 
-abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures with MustMatchers {
+abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fixtures with MustMatchers {
 
-  def extractValueFrom[A](mval: M[A]): Future[A]
+  implicit class FromMonadF[F[_]: ToFuture, A](value: F[A]){
+    def toFuture: Future[A] = implicitly[ToFuture[F]].toFuture(value)
+  }
 
   implicit def app: AppError[M]
-
 
   "AsyncValidation scoping" when {
 
@@ -42,26 +43,28 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
       "validate using validators from scope" should {
 
         "case 1 - valid" in {
-          extractValueFrom(email_Valid.isValidAsync).map(_ mustBe true)
+          email_Valid.isValidAsync.toFuture.map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
-          extractValueFrom(email_Valid_Long.validateAsync)
+          email_Valid_Long
+            .validateAsync
+            .toFuture
             .map(_.errors must contain(ValidationError(Email_Err_AlreadyTaken)))
         }
       }
 
       "automatically derive AsyncValidator instances" should {
         "case 1 - valid" in {
-          extractValueFrom(user_Valid.isValidAsync).map(_ mustBe true)
+          user_Valid.isValidAsync.toFuture.map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
           val address_InvalidPostalCode = address_Valid.copy(postalCode = PostalCode("23456"))
           val user_InvalidPostalCode = user_Valid.copy(address = address_InvalidPostalCode)
 
-          extractValueFrom(user_InvalidPostalCode.validateAsync).map {
-            _.toFieldErrMapping mustBe List(
+          user_InvalidPostalCode.validateAsync.toFuture
+            .map {_.toFieldErrMapping mustBe List(
               "address.postalCode" -> PostalCode_Err_DoesNotExist
             )
           }
@@ -95,11 +98,11 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
       "auto generate trivial async validator instance from the sync one" should {
 
         "case 1 - valid all in all" in {
-          extractValueFrom(email_Valid.isValidAsync).map(_ mustBe true)
+          email_Valid.isValidAsync.toFuture.map(_ mustBe true)
         }
 
         "case 2 - invalid in the context of async, but valid here" in {
-          extractValueFrom(email_Valid_Long.isValidAsync).map(_ mustBe true)
+          email_Valid_Long.isValidAsync.toFuture.map(_ mustBe true)
         }
       }
     }
@@ -109,28 +112,28 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
       implicit val invalidValidator = AsyncValidatorM.invalid[M, Email](Email_Err_ExternalCause)
 
       "be invalid on valid case" in {
-        extractValueFrom(email_Valid.isValidAsync).map(_ mustBe false)
-        extractValueFrom(email_Valid.validateAsync).map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
+        email_Valid.isValidAsync.toFuture.map(_ mustBe false)
+        email_Valid.validateAsync.toFuture.map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
       }
 
       "be invalid with predefined error on invalid case" in {
-        extractValueFrom(email_Invalid1.isValidAsync).map(_ mustBe false)
-        extractValueFrom(email_Invalid1.validateAsync).map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
+        email_Invalid1.isValidAsync.toFuture.map(_ mustBe false)
+        email_Invalid1.validateAsync.toFuture.map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
       }
     }
 
     "Validate simple email" should {
 
       "accept user With valid email" in {
-        extractValueFrom(user_Valid.isValidAsync).map(_ mustBe true)
+        user_Valid.isValidAsync.toFuture.map(_ mustBe true)
       }
 
       "reject user With invalid email" in {
-        extractValueFrom(user_Invalid3.isValidAsync).map(_ mustBe false)
+        user_Invalid3.isValidAsync.toFuture.map(_ mustBe false)
       }
 
       "rejected user errors should contain proper error massage" in {
-        extractValueFrom(user_Invalid3.validateAsync).map(_.errors must contain(expectedValidationException))
+        user_Invalid3.validateAsync.toFuture.map(_.errors must contain(expectedValidationException))
       }
     }
 
@@ -139,14 +142,16 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
 
         implicit val userValidator = octopus.Validator[User]
 
-        extractValueFrom(user_Invalid3.validate.alsoValidateAsync(userWithEmailValidator))
+        user_Invalid3.validate.alsoValidateAsync(userWithEmailValidator)
+          .toFuture
           .map(_.errors must contain(expectedValidationException))
       }
 
       "then validate async valid regular validator case" in {
         implicit val userValidator = octopus.Validator[User]
 
-        extractValueFrom(user_Invalid3.validate.thenValidateAsync(userWithEmailValidator))
+        user_Invalid3.validate.thenValidateAsync(userWithEmailValidator)
+          .toFuture
           .map(_.errors must contain(expectedValidationException))
       }
 
@@ -158,7 +163,8 @@ abstract class AsyncValidationSpec[M[_]] extends AsyncWordSpec with Fixtures wit
         implicit val userValidator = octopus.Validator[User]
           .rule(_.id.id == 2, "Onlu user with id 2 is allowed")
 
-        extractValueFrom(user_Invalid3.validate.thenValidateAsync(userWithEmailValidator))
+        user_Invalid3.validate.thenValidateAsync(userWithEmailValidator)
+          .toFuture
           .map(_.errors must contain theSameElementsAs expectedValidationError)
       }
     }

@@ -2,10 +2,8 @@ package octopus
 
 import scala.concurrent.Future
 
-class ScalaFutureAppSpec
-  extends AsyncValidationSpec[Future] {
+import ToFuture._
 
-  override def extractValueFrom[A](mval: Future[A]): Future[A] = mval
-
+class ScalaFutureAppSpec extends AsyncValidationSpec[Future] {
   override implicit def app: AppError[Future] = AppError.futureAppError(executionContext)
 }
