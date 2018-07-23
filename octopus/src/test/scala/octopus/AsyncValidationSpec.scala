@@ -1,29 +1,24 @@
 package octopus
 
+import octopus.ToFuture.syntax._
 import octopus.dsl._
 import octopus.example.domain._
 import octopus.syntax._
 import octopus.{AsyncValidatorM => _}
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
-import scala.concurrent.Future
+import scala.language.higherKinds
 
-abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fixtures with MustMatchers {
-
-  implicit class FromMonadF[F[_]: ToFuture, A](value: F[A]){
-    def toFuture: Future[A] = implicitly[ToFuture[F]].toFuture(value)
-  }
-
-  implicit def app: AppError[M]
+abstract class AsyncValidationSpec[M[_]: AppError : ToFuture] extends AsyncWordSpec with Fixtures with MustMatchers {
 
   "AsyncValidation scoping" when {
 
     val emailServiceStub = new EmailService[M] {
       def isEmailTaken(email: String): M[Boolean] =
-        app.pure(email.length <= 10)
+        AppError[M].pure(email.length <= 10)
 
       def doesDomainExists(email: String): M[Boolean] = {
-        app.pure {
+        AppError[M].pure {
           val domain = email.dropWhile(_ != '@').tail
           Set("y.com", "example.com").contains(domain)
         }
@@ -32,7 +27,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
 
     val geoServiceStub = new GeoService[M] {
       def doesPostalCodeExist(postalCode: PostalCode.T): M[Boolean] =
-        app.pure(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
+        AppError[M].pure(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
     }
 
     val asyncValidators = new AsyncValidators(emailServiceStub, geoServiceStub)

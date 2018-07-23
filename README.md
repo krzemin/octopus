@@ -108,6 +108,46 @@ Or if you are using Scala.js:
 libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.3.3"
 ```
 
+### Integration with Cats / Scalaz
+
+There are available additional modules that simplify integration with
+Cats and Scalaz validation types.
+
+#### Cats
+
+If you want to integrate with Cats, simply add following line to `build.sbt`:
+
+```scala
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.3"
+```
+
+Having this dependency on classpath, you can use 
+
+```scala
+import octopus.syntax._
+import octopus.cats._
+
+user1.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Valid(user1)
+
+user2.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Invalid(NonEmptyList(...))
+```
+
+See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusCats/src/test/scala/octopus/cats/CatsIntegrationSpec.scala)
+for more information.
+
+
+#### Scalaz
+
+Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
+
+```scala
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.3"
+```
+
+See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
+for reference.
+
+
 ### Asynchronous validators
 
 Sometimes validation rules are more complex in sense that they can't be decided
@@ -161,17 +201,22 @@ Comments:
 * (4) we are importing instances for asynchronous validators into current scope
   so that later we can use `.isValidAsync`/`.validateAsync` extension methods.
 
-#### Another asynchronous monad
 
-At the time there exists possibility to use cats.IO or scalaz.IO monad for asynchronous validation rules.
-First of all proper dependency is required
-```
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz-effect" % "0.3.3"
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats-effect" % "0.3.3"
-```
-Then with propper import `asyncM` method on Validator gives user the possibility to specify target monad:
+#### Using other monad
+
+When working with asynchronous validators DSL, by default you define rules and
+obtain results in scala Future. However you're not particularly tied to it.
+
+We provide bridge instances for internal `AppError` (which resembles applicative
+functor with error handling capabilities) for cats `ApplicativeError` and scalaz
+`MonadError`. Any wrapper type `M[_]` for which you already have those instances,
+will work. Otherwise, you need to define your own instance for `AppError` and make
+sure it's in implicit scope when using rule dsl.
+
+Example integration with `cats.effect.IO`:
+
 ```scala
-  import octopus.async.cats._ // octopus.async.scalaz._
+  import octopus.async.cats.implicits._
   import cats.effect.IO
 
   trait EmailService {
@@ -185,49 +230,8 @@ Then with propper import `asyncM` method on Validator gives user the possibility
       .asyncM[IO].ruleVC(emailService.isEmailTaken, "email is already taken by someone else") // (2)
       .async.rule(_.address, emailService.doesDomainExists, "domain does not exists") // (3)
 
-  Email("abc@xyz.qux").isValidAsync // IO(false): IO[Boolean]
+  Email("abc@xyz.qux").isValidAsync // IO[Boolean]
 ```
-
-
-### Integration with Cats / Scalaz
-
-There are available additional modules that simplify integration with
-Cats and Scalaz validation types.
-
-#### Cats
-
-If you want to integrate with Cats, simply add following line to `build.sbt`:
-
-```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.3"
-```
-
-Having this dependency on classpath, you can use 
-
-```scala
-import octopus.syntax._
-import octopus.cats._
-
-user1.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Valid(user1)
-
-user2.validate.toValidatedNel // : ValidatedNel[octopus.ValidationError, User] = Invalid(NonEmptyList(...))
-```
-
-See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusCats/src/test/scala/octopus/cats/CatsIntegrationSpec.scala)
-for more information.
-
-
-#### Scalaz
-
-Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
-
-```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.3"
-```
-
-See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
-for reference.
-
 
 ## FAQ
 
@@ -253,7 +257,7 @@ composability:
 
 ## License
 
-Copyright 2016-2017 Piotr Krzemiński
+Copyright 2016-2018 Piotr Krzemiński
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
