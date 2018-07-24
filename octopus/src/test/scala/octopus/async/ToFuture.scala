@@ -1,7 +1,7 @@
-package octopus
+package octopus.async
 
 import scala.concurrent.Future
-import language.higherKinds
+import scala.language.higherKinds
 
 trait ToFuture[F[_]] {
   def toFuture[A](value: F[A]): Future[A]

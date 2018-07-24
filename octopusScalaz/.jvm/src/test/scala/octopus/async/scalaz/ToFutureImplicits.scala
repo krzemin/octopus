@@ -1,6 +1,6 @@
 package octopus.async.scalaz
 
-import octopus.ToFuture
+import octopus.async.ToFuture
 import scalaz.{-\/, \/-}
 import scalaz.concurrent.Task
 

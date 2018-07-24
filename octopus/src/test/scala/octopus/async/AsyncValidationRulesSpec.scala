@@ -1,10 +1,11 @@
-package octopus
+package octopus.async
 
 import java.io.IOException
 
 import octopus.dsl._
 import octopus.example.domain.{Email, User}
 import octopus.syntax._
+import octopus.{AsyncValidator => _, Validator => _, _}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 

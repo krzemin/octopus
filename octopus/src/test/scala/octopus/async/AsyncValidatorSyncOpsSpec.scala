@@ -1,8 +1,9 @@
-package octopus
+package octopus.async
 
 import octopus.dsl._
 import octopus.example.domain.{Age, Email, User}
 import octopus.syntax._
+import octopus.{AsyncValidator, Fixtures, ValidationError}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 

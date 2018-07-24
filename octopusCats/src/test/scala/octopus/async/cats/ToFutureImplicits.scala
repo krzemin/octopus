@@ -1,11 +1,10 @@
 package octopus.async.cats
 
-import octopus.ToFuture
-
 import scala.concurrent.Future
 import _root_.cats.effect.IO
 import monix.eval.Task
 import monix.execution.Scheduler
+import octopus.async.ToFuture
 
 object ToFutureImplicits {
 
