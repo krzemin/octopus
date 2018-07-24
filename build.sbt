@@ -1,3 +1,5 @@
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+
 lazy val root = project.in(file("."))
   .settings(coreSettings: _*)
   .settings(noPublishSettings: _*)
@@ -21,7 +23,8 @@ lazy val dependencies = Seq(
   libraryDependencies += "org.scalatest" %%% "scalatest" % versions.scalatest % "test"
 )
 
-lazy val octopus = crossProject.crossType(CrossType.Pure)
+lazy val octopus = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
   .settings(
     moduleName := "octopus",
     name := "octopus",
@@ -35,7 +38,8 @@ lazy val octopusJVM = octopus.jvm
 lazy val octopusJS = octopus.js
 
 
-lazy val octopusCats = crossProject.crossType(CrossType.Pure)
+lazy val octopusCats = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
   .settings(
     moduleName := "octopus-cats", name := "octopus-cats",
     description := "Cats integration for Octopus validation library"
@@ -54,7 +58,8 @@ lazy val octopusCatsJVM = octopusCats.jvm
 lazy val octopusCatsJS = octopusCats.js
 
 
-lazy val octopusScalaz = crossProject.crossType(CrossType.Pure)
+lazy val octopusScalaz = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
   .settings(
     moduleName := "octopus-scalaz", name := "octopus-scalaz",
     description := "Scalaz integration for Octopus validation library"
