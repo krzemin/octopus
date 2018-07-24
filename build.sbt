@@ -9,10 +9,10 @@ lazy val versions = new {
   val scala211 = "2.11.12"
   val shapeless = "2.3.3"
   val scalatest = "3.0.5"
-  val cats = "1.1.0"
+  val cats = "1.2.0"
   val catsEffect = "1.0.0-RC2"
   val monix = "3.0.0-RC1"
-  val scalaz = "7.2.22"
+  val scalaz = "7.2.25"
 }
 
 lazy val dependencies = Seq(
