@@ -7,7 +7,7 @@ import _root_.cats.effect.IO
 import monix.eval.Task
 import monix.execution.Scheduler
 
-object toFuture {
+object ToFuture {
 
   implicit val catsIOToFuture: ToFuture[IO] = new ToFuture[IO] {
     def toFuture[A](value: IO[A]): Future[A] = value.unsafeToFuture()

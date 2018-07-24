@@ -6,7 +6,7 @@ import scalaz.concurrent.Task
 
 import scala.concurrent.{Future, Promise}
 
-object toFuture {
+object ToFuture {
 
   implicit val scalazTaskToFuture: ToFuture[Task] = new ToFuture[Task] {
 
