@@ -40,27 +40,27 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
       "validate using validators from scope" should {
 
         "case 1 - valid" in {
-          email_Valid.isValidAsync.toFuture.map(_ mustBe true)
+          email_Valid.isValidAsync.toFuture().map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
           email_Valid_Long
             .validateAsync
-            .toFuture
+            .toFuture()
             .map(_.errors must contain(ValidationError(Email_Err_AlreadyTaken)))
         }
       }
 
       "automatically derive AsyncValidator instances" should {
         "case 1 - valid" in {
-          user_Valid.isValidAsync.toFuture.map(_ mustBe true)
+          user_Valid.isValidAsync.toFuture().map(_ mustBe true)
         }
 
         "case 2 - invalid" in {
           val address_InvalidPostalCode = address_Valid.copy(postalCode = PostalCode("23456"))
           val user_InvalidPostalCode = user_Valid.copy(address = address_InvalidPostalCode)
 
-          user_InvalidPostalCode.validateAsync.toFuture
+          user_InvalidPostalCode.validateAsync.toFuture()
             .map {_.toFieldErrMapping mustBe List(
               "address.postalCode" -> PostalCode_Err_DoesNotExist
             )
@@ -97,11 +97,11 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
       "auto generate trivial async validator instance from the sync one" should {
 
         "case 1 - valid all in all" in {
-          email_Valid.isValidAsync.toFuture.map(_ mustBe true)
+          email_Valid.isValidAsync.toFuture().map(_ mustBe true)
         }
 
         "case 2 - invalid in the context of async, but valid here" in {
-          email_Valid_Long.isValidAsync.toFuture.map(_ mustBe true)
+          email_Valid_Long.isValidAsync.toFuture().map(_ mustBe true)
         }
       }
     }
@@ -114,28 +114,28 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
         AsyncValidatorM.invalid[M, Email](Email_Err_ExternalCause)
 
       "be invalid on valid case" in {
-        email_Valid.isValidAsync.toFuture.map(_ mustBe false)
-        email_Valid.validateAsync.toFuture.map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
+        email_Valid.isValidAsync.toFuture().map(_ mustBe false)
+        email_Valid.validateAsync.toFuture().map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
       }
 
       "be invalid with predefined error on invalid case" in {
-        email_Invalid1.isValidAsync.toFuture.map(_ mustBe false)
-        email_Invalid1.validateAsync.toFuture.map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
+        email_Invalid1.isValidAsync.toFuture().map(_ mustBe false)
+        email_Invalid1.validateAsync.toFuture().map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
       }
     }
 
     "Validate simple email" should {
 
       "accept user With valid email" in {
-        user_Valid.isValidAsync.toFuture.map(_ mustBe true)
+        user_Valid.isValidAsync.toFuture().map(_ mustBe true)
       }
 
       "reject user With invalid email" in {
-        user_Invalid3.isValidAsync.toFuture.map(_ mustBe false)
+        user_Invalid3.isValidAsync.toFuture().map(_ mustBe false)
       }
 
       "rejected user errors should contain proper error massage" in {
-        user_Invalid3.validateAsync.toFuture.map(_.errors must contain(expectedValidationException))
+        user_Invalid3.validateAsync.toFuture().map(_.errors must contain(expectedValidationException))
       }
     }
 
@@ -145,7 +145,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
         implicit val userValidator: Validator[User] = Validator[User]
 
         user_Invalid3.validate.alsoValidateAsync(userWithEmailValidator)
-          .toFuture
+          .toFuture()
           .map(_.errors must contain(expectedValidationException))
       }
 
@@ -153,7 +153,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
         implicit val userValidator: Validator[User] = Validator[User]
 
         user_Invalid3.validate.thenValidateAsync(userWithEmailValidator)
-          .toFuture
+          .toFuture()
           .map(_.errors must contain(expectedValidationException))
       }
 
@@ -166,7 +166,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
           .rule(_.id.id == 2, "Onlu user with id 2 is allowed")
 
         user_Invalid3.validate.thenValidateAsync(userWithEmailValidator)
-          .toFuture
+          .toFuture()
           .map(_.errors must contain theSameElementsAs expectedValidationError)
       }
     }

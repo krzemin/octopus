@@ -15,7 +15,7 @@ object ToFuture {
 
   object syntax {
     implicit class ToFutureOps[F[_]: ToFuture, A](value: F[A]) {
-      def toFuture: Future[A] = implicitly[ToFuture[F]].toFuture(value)
+      def toFuture(): Future[A] = implicitly[ToFuture[F]].toFuture(value)
     }
   }
 }
