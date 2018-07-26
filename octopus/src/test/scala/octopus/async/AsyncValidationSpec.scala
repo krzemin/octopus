@@ -13,29 +13,40 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
 
   implicit def appError: AppError[M]
 
-  "AsyncValidation scoping" when {
+  private val emailServiceStub = new EmailService[M] {
+    def isEmailTaken(email: String): M[Boolean] =
+      AppError[M].pure(email.length <= 10)
 
-    val emailServiceStub = new EmailService[M] {
-      def isEmailTaken(email: String): M[Boolean] =
-        AppError[M].pure(email.length <= 10)
-
-      def doesDomainExists(email: String): M[Boolean] = {
-        AppError[M].pure {
-          val domain = email.dropWhile(_ != '@').tail
-          Set("y.com", "example.com").contains(domain)
-        }
+    def doesDomainExists(email: String): M[Boolean] = {
+      AppError[M].pure {
+        val domain = email.dropWhile(_ != '@').tail
+        Set("y.com", "example.com").contains(domain)
       }
     }
+  }
 
-    val geoServiceStub = new GeoService[M] {
-      def doesPostalCodeExist(postalCode: PostalCode.T): M[Boolean] =
-        AppError[M].pure(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
+  private val geoServiceStub = new GeoService[M] {
+    def doesPostalCodeExist(postalCode: PostalCode.T): M[Boolean] =
+      AppError[M].pure(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
+
+    def isPostalCodeValidForCity(postalCode: PostalCode.T, city: String): M[Boolean] = {
+      if(city == "Los Angeles") {
+        AppError[M].pure(true)
+      } else {
+        throw new RuntimeException("Not implemented yet")
+      }
     }
+  }
 
-    val asyncValidators = new AsyncValidators(emailServiceStub, geoServiceStub)
+  private val asyncValidators = new AsyncValidators(emailServiceStub, geoServiceStub)
+
+
+
+  "Asynchronous validation" when {
+
+    import asyncValidators._
 
     "have explicit async validator in scope" should {
-      import asyncValidators._
 
       "validate using validators from scope" should {
 
@@ -79,13 +90,13 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
       path = FieldPath(List(FieldLabel('email)))
     )
 
-    def validateEmail(email: Email): Boolean = email.address match {
-      case e if e == email_Valid.address => true
-      case _ => false
-    }
-
     def validateEmailF(email: Email): M[Boolean] =
-      AppError[M].pure(validateEmail(email))
+      AppError[M].pure {
+        email.address match {
+          case e if e == email_Valid.address => true
+          case _ => false
+        }
+      }
 
     implicit val userWithEmailValidator: AsyncValidatorM[M, User] =
       Validator[User]
@@ -135,7 +146,17 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
       }
 
       "rejected user errors should contain proper error massage" in {
-        user_Invalid3.validateAsync.toFuture().map(_.errors must contain(expectedValidationException))
+        user_Invalid3.validateAsync.toFuture()
+          .map(_.errors must contain(expectedValidationException))
+
+        // this test is pretty fucked up, as this doesn't pick rules from asyncValidators object
+        // note they are not imported here! FIX this up!
+
+//        user_Invalid1.validateAsync.toFuture().map {
+//          result =>
+//            println(result.toFieldErrMapping)
+//            result.errors must contain(expectedValidationException)
+//        }
       }
     }
 
@@ -159,11 +180,11 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
 
       "then validate async with invalid regular case" in {
         val expectedValidationError = List(ValidationError(
-          message = "Onlu user with id 2 is allowed"
+          message = "Only user with id 2 is allowed"
         ))
 
         implicit val userValidator: Validator[User] = Validator[User]
-          .rule(_.id.id == 2, "Onlu user with id 2 is allowed")
+          .rule(_.id.id == 2, "Only user with id 2 is allowed")
 
         user_Invalid3.validate.thenValidateAsync(userWithEmailValidator)
           .toFuture()

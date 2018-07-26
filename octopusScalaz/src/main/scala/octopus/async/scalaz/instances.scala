@@ -12,6 +12,9 @@ object instances {
     def pure[A](a: A): M[A] =
       me.point(a)
 
+    def failed[A](why: Throwable): M[A] =
+      me.raiseError(why)
+
     def map[A, B](ma: M[A])(f: A => B): M[B] =
       me.map(ma)(f)
 

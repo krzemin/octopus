@@ -12,6 +12,9 @@ object implicits {
     def pure[A](a: A): M[A] =
       ae.pure(a)
 
+    def failed[A](why: Throwable): M[A] =
+      ae.raiseError(why)
+
     def map[A, B](ma: M[A])(f: A => B): M[B] =
       ae.map(ma)(f)
 
