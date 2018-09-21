@@ -7,7 +7,7 @@ import scala.language.higherKinds
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-object AsyncValidationRules {
+object AsyncValidationRules extends Serializable {
 
   def rule[M[_]: AppError, T](asyncPred: T => M[Boolean], whenInvalid: String): AsyncValidatorM[M, T] =
     instance { (obj: T) =>

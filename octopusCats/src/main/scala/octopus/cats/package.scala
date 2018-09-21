@@ -4,7 +4,7 @@ import _root_.cats.data.{NonEmptyList, Validated, ValidatedNel}
 
 package object cats {
 
-  implicit class OctopusCatsOps[T](val vr: ValidationResult[T]) extends AnyVal {
+  implicit class OctopusCatsOps[T](val vr: ValidationResult[T]) extends AnyVal with Serializable {
 
     def toValidatedNel: ValidatedNel[ValidationError, T] = vr.errors match {
       case Nil =>
