@@ -42,7 +42,7 @@ object DerivedValidator extends LowPriorityValidatorDerivation {
   }
 }
 
-trait LowPriorityValidatorDerivation {
+trait LowPriorityValidatorDerivation extends Serializable{
 
   implicit val hnilValidator: DerivedValidator[HNil] = DerivedValidator(Validator[HNil])
 

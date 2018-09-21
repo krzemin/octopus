@@ -1,11 +1,11 @@
 package octopus
 
-trait Validator[T] {
+trait Validator[T] extends Serializable{
 
   def validate(obj: T): List[ValidationError]
 }
 
-object Validator {
+object Validator extends Serializable {
 
   def instance[T](f: T => List[ValidationError]): Validator[T] =
     new Validator[T] {

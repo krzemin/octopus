@@ -1,6 +1,6 @@
 package octopus
 
-case class ValidationError(message: String, path: FieldPath = FieldPath.empty) {
+case class ValidationError(message: String, path: FieldPath = FieldPath.empty) extends Serializable {
 
   def ::(pathElement: PathElement): ValidationError =
     copy(path = pathElement :: path)

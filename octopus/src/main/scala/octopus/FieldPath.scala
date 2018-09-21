@@ -1,6 +1,6 @@
 package octopus
 
-sealed trait PathElement extends Any {
+sealed trait PathElement extends Any with Serializable{
   def asString: String
 }
 
@@ -17,7 +17,7 @@ case class MapKey(key: String) extends AnyVal with PathElement {
 }
 
 
-case class FieldPath(parts: List[PathElement]) extends AnyVal {
+case class FieldPath(parts: List[PathElement]) extends AnyVal with Serializable {
 
   def ::(element: PathElement): FieldPath =
     copy(element :: parts)
@@ -36,7 +36,7 @@ case class FieldPath(parts: List[PathElement]) extends AnyVal {
   }
 }
 
-object FieldPath {
+object FieldPath extends Serializable {
 
   val empty = FieldPath(Nil)
 }
