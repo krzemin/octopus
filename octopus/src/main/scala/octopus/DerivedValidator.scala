@@ -11,6 +11,7 @@ object DerivedValidator extends LowPriorityValidatorDerivation {
 
   implicit val stringValidator: DerivedValidator[String] = DerivedValidator(Validator[String])
   implicit val intValidator: DerivedValidator[Int] = DerivedValidator(Validator[Int])
+  implicit val longValidator: DerivedValidator[Long] = DerivedValidator(Validator[Long])
   implicit val boolValidator: DerivedValidator[Boolean] = DerivedValidator(Validator[Boolean])
   implicit val doubleValidator: DerivedValidator[Double] = DerivedValidator(Validator[Double])
   implicit val floatValidator: DerivedValidator[Float] = DerivedValidator(Validator[Float])
