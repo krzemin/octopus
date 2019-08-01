@@ -1,10 +1,11 @@
-package octopus
+package octopus.async
 
 import java.io.IOException
 
 import octopus.dsl._
 import octopus.example.domain.{Email, User}
 import octopus.syntax._
+import octopus.{AsyncValidator => _, Validator => _, _}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
@@ -108,6 +109,23 @@ class AsyncValidationRulesSpec
         user_Valid.validateAsync.map(_.errors must contain (expectedValidationException))
       }
     }
+    "Catch non fatal rule outside effect" should {
+      val validateF = (email: Email) => email match {
+        case e if e.address == email_Invalid1.address => throw new RuntimeException(Exception_HandledDuringValidation)
+        case _ => Future.failed(new Exception("never reached message"))
+      }
+      implicit val emailCatchNonFatal = Validator[Email].async
+        .ruleCatchNonFatal(validateF, Email_Err_Invalid, e => e.getMessage)
+
+      "fail validation with exception outside effect" in {
+        val expectedValidatorException = ValidationError(
+          message = Exception_HandledDuringValidation
+        )
+        email_Invalid1.isValidAsync.map(_ mustBe false)
+        email_Invalid1.validateAsync.map(_.errors must contain (expectedValidatorException))
+      }
+    }
+
 
     "Catch only wanted exception" should {
       "catch and handle predicted exception" in {
@@ -122,6 +140,19 @@ class AsyncValidationRulesSpec
           .ruleCatchOnly[IOException](userThrowNonFatal, User_Err_Invalid, _ => Exception_HandledDuringValidation)
 
         an [Exception] must be thrownBy user_Valid.isValidAsync.futureValue
+      }
+
+      "Catch only with outside effect exception" should {
+        val validateF = (email: Email) => email match {
+          case e if e.address == email_Invalid1.address => throw new RuntimeException(Exception_HandledDuringValidation)
+          case _ => Future.failed(new Exception("never reached message"))
+        }
+        implicit val emailCatchNonFatal = Validator[Email].async
+          .ruleCatchOnly[IOException](validateF, Email_Err_Invalid, e => e.getMessage)
+
+        "fail validation with exception outside effect" in {
+          an [RuntimeException] must be thrownBy user_Invalid1.isValidAsync.futureValue
+        }
       }
     }
 
