@@ -151,9 +151,6 @@ class AsyncValidationRulesSpec
           .ruleCatchOnly[IOException](validateF, Email_Err_Invalid, e => e.getMessage)
 
         "fail validation with exception outside effect" in {
-          val expectedValidatorException = ValidationError(
-            message = Exception_HandledDuringValidation
-          )
           an [RuntimeException] must be thrownBy user_Invalid1.isValidAsync.futureValue
         }
       }
