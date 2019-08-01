@@ -6,7 +6,7 @@ import shapeless.tag.@@
 import scala.language.higherKinds
 
 
-sealed class ValidationResult[T](private[octopus] val value: T, val errors: List[ValidationError]) {
+sealed class ValidationResult[T](private[octopus] val value: T, val errors: List[ValidationError]) extends Serializable {
 
   /**
     * Eager validation composition

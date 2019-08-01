@@ -5,7 +5,7 @@ import language.higherKinds
 import scala.annotation.implicitNotFound
 
 @implicitNotFound("Implicit instance for octopus.AppError[${M}] not found in scope!")
-trait AppError[M[_]] {
+trait AppError[M[_]] extends Serializable {
   def pure[A](a: A): M[A]
   def failed[A](why: Throwable): M[A]
   def map[A, B](ma: M[A])(f: A => B): M[B]
@@ -13,7 +13,7 @@ trait AppError[M[_]] {
   def recover[A, B <: A](ma: M[A], f: PartialFunction[Throwable, B]): M[A]
 }
 
-object AppError {
+object AppError extends Serializable {
   def apply[M[_]](implicit a: AppError[M]): AppError[M] = a
 
   implicit def futureAppError(implicit ec: ExecutionContext): AppError[Future] = new AppError[Future] {

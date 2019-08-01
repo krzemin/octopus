@@ -4,7 +4,7 @@ import _root_.scalaz.{NonEmptyList, Validation, ValidationNel}
 
 package object scalaz {
 
-  implicit class OctopusScalazOps[T](val vr: ValidationResult[T]) extends AnyVal {
+  implicit class OctopusScalazOps[T](val vr: ValidationResult[T]) extends AnyVal with Serializable {
 
     def toValidationNel: ValidationNel[ValidationError, T] = vr.errors match {
       case Nil =>

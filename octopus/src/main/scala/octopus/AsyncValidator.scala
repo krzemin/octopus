@@ -3,7 +3,7 @@ package octopus
 import scala.concurrent.Future
 import scala.language.higherKinds
 
-private[octopus] object AsyncValidator {
+private[octopus] object AsyncValidator extends Serializable {
   def apply[T](implicit appError: AppError[Future]): octopus.dsl.AsyncValidator[T] =
     AsyncValidatorM.lift[Future, T](Validator.apply[T])
 }
@@ -12,7 +12,7 @@ trait AsyncValidatorM[M[_], T] {
   def validate(obj: T)(implicit appError: AppError[M]): M[List[ValidationError]]
 }
 
-object AsyncValidatorM {
+object AsyncValidatorM extends Serializable {
 
   def instance[M[_], T](f: T => M[List[ValidationError]]): AsyncValidatorM[M, T] = {
     new AsyncValidatorM[M, T] {

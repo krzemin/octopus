@@ -4,7 +4,7 @@ import scala.language.higherKinds
 
 object syntax {
 
-  implicit class ValidationOps[T](val obj: T) extends AnyVal {
+  implicit class ValidationOps[T](val obj: T) extends AnyVal with Serializable {
 
     def validate(implicit v: Validator[T]): ValidationResult[T] =
       new ValidationResult(obj, v.validate(obj))
@@ -13,7 +13,7 @@ object syntax {
       validate.isValid
   }
 
-  implicit class AsyncValidationOps[T](val obj: T) extends AnyVal {
+  implicit class AsyncValidationOps[T](val obj: T) extends AnyVal with Serializable {
 
     def validateAsync[M[_]](implicit av: AsyncValidatorM[M, T], appError: AppError[M]): M[ValidationResult[T]] =
       appError.map(av.validate(obj)) { errors =>

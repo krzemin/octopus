@@ -19,7 +19,7 @@ object dsl {
   type AsyncValidator[T] = octopus.AsyncValidatorM[Future, T]
   val AsyncValidator = octopus.AsyncValidator
 
-  implicit class ValidatorOps[T](val v: Validator[T]) extends AnyVal {
+  implicit class ValidatorOps[T](val v: Validator[T]) extends AnyVal with Serializable {
 
     def compose(v2: Validator[T]): Validator[T] =
       (obj: T) => v.validate(obj) ++ v2.validate(obj)
@@ -69,7 +69,7 @@ object dsl {
       new AsyncValidatorAsyncOps[M, T](AsyncValidatorM.lift[M, T](v))
   }
 
-  class AsyncValidatorAsyncOps[M[_], T](val v: AsyncValidatorM[M, T]) extends AnyVal {
+  class AsyncValidatorAsyncOps[M[_], T](val v: AsyncValidatorM[M, T]) extends AnyVal with Serializable {
 
     def compose(v2: AsyncValidatorM[M, T])
                (implicit appError: AppError[M]): AsyncValidatorM[M, T] =
@@ -131,7 +131,7 @@ object dsl {
 
   }
 
-  implicit class AsyncValidatorSyncOps[M[_], T](val v: AsyncValidatorM[M, T]) extends AnyVal {
+  implicit class AsyncValidatorSyncOps[M[_], T](val v: AsyncValidatorM[M, T]) extends AnyVal with Serializable {
 
     def async: AsyncValidatorAsyncOps[M, T] =
       new AsyncValidatorAsyncOps[M, T](v)
