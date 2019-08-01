@@ -1,10 +1,12 @@
 package octopus.async
 
+import java.io.IOException
+
 import octopus.async.ToFuture.syntax._
 import octopus.dsl._
 import octopus.example.domain._
 import octopus.syntax._
-import octopus.{AppError, Fixtures, ValidationError, FieldPath, FieldLabel}
+import octopus.{AppError, FieldLabel, FieldPath, Fixtures, ValidationError}
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.language.higherKinds
@@ -132,6 +134,35 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
       "be invalid with predefined error on invalid case" in {
         email_Invalid1.isValidAsync.toFuture().map(_ mustBe false)
         email_Invalid1.validateAsync.toFuture().map(_.errors must contain(ValidationError(Email_Err_ExternalCause)))
+      }
+    }
+    "have broken validator in the scope" should {
+      val Email_Err_ExternalCause = "External cause outside M"
+
+      val validateF: Email => M[Boolean] = (email: Email) => email match {
+        case e if e.address == email_Invalid1.address => AppError[M].failed(new IOException("nvm"))
+        case _ => throw new RuntimeException(Email_Err_ExternalCause)
+      }
+
+      val emailValidator = Validator[Email]
+        .asyncM[M]
+
+      "catch non fatal error outside of targeted M" in {
+        implicit val emailValidatorWithBrokenRule = emailValidator
+          .ruleCatchNonFatal(validateF, "Email invalid", e => e.getMessage)
+
+        val expectedValidationError = ValidationError(
+          message = Email_Err_ExternalCause
+        )
+
+        email_Invalid2.isValidAsync.toFuture().map(_ mustBe false)
+        email_Invalid2.validateAsync.toFuture().map(_.errors must contain (expectedValidationError))
+      }
+      "catch only handle error outside of targeted M" in {
+        implicit val emailValidatorWithBrokenRule = emailValidator
+          .ruleCatchOnly[IOException](validateF, "Email invalid", e => e.getMessage)
+
+        email_Invalid2.isValidAsync.toFuture().failed.map(_ mustBe an[RuntimeException])
       }
     }
 
