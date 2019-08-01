@@ -2,7 +2,7 @@ package octopus
 
 import scala.language.higherKinds
 
-private[octopus] object DslMacros {
+private[octopus] object DslMacros extends Serializable {
 
   def ruleFieldSelector[T: c.WeakTypeTag, F: c.WeakTypeTag](c: scala.reflect.macros.blackbox.Context)
                                                            (selector: c.Expr[T => F],

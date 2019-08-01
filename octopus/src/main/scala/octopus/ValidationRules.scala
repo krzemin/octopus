@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
-object ValidationRules {
+object ValidationRules extends Serializable {
 
   def rule[T](pred: T => Boolean, whenInvalid: String): Validator[T] =
     (obj: T) => if (pred(obj)) Nil else List(ValidationError(whenInvalid))

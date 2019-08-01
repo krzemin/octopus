@@ -42,7 +42,7 @@ object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
     }
 }
 
-trait LowPriorityAsyncValidatorDerivation {
+trait LowPriorityAsyncValidatorDerivation extends Serializable{
 
   implicit def fromSyncValidator[M[_]: AppError, T](implicit v: Validator[T]): DerivedAsyncValidator[M, T] =
     DerivedAsyncValidator(AsyncValidatorM.lift(v))

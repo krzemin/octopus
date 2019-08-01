@@ -2,14 +2,14 @@ package octopus
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AppError[M[_]] {
+trait AppError[M[_]] extends Serializable{
   def pure[A](a: A): M[A]
   def map2[A, B, C](first: M[A], second: M[B])(combine: (A, B) => C): M[C]
   def recover[A, B <: A](app: M[A], f: Throwable => B): M[A]
   def map[A, B](fa: M[A])(f: A => B): M[B]
 }
 
-object AppError {
+object AppError extends Serializable {
   def apply[M[_]](implicit a: AppError[M]): AppError[M] = a
 
   implicit def futureAppError(implicit ec: ExecutionContext): AppError[Future] = new AppError[Future] {
