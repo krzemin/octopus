@@ -99,13 +99,13 @@ Octopus is currently available for Scala 2.11, 2.12 and Scala.js.
 To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %% "octopus" % "0.3.3"
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.4.0"
 ```
 
 Or if you are using Scala.js:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.3.3"
+libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.4.0"
 ```
 
 ### Integration with Cats / Scalaz
@@ -118,7 +118,7 @@ Cats and Scalaz validation types.
 If you want to integrate with Cats, simply add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.3.3"
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.4.0"
 ```
 
 Having this dependency on classpath, you can use 
@@ -141,7 +141,7 @@ for more information.
 Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.3.3"
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.4.0"
 ```
 
 See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
@@ -257,7 +257,7 @@ composability:
 
 ## License
 
-Copyright 2016-2018 Piotr Krzemiński
+Copyright 2016-2019 Piotr Krzemiński
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
