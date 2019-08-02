@@ -13,6 +13,6 @@ object ToFutureImplicits {
   }
 
   implicit def monixTaskToFuture(implicit s: Scheduler): ToFuture[Task] = new ToFuture[Task] {
-    def toFuture[A](value: Task[A]): Future[A] = value.runAsync
+    def toFuture[A](value: Task[A]): Future[A] = value.runToFuture
   }
 }
