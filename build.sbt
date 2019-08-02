@@ -80,7 +80,7 @@ lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
   scalaVersion := versions.scala212,
-  crossScalaVersions := Seq(versions.scala211, versions.scala212, versions.scala212),
+  crossScalaVersions := Seq(versions.scala211, versions.scala212),
   scalacOptions := commonScalacOptions
 ) ++ lintUnused
 
