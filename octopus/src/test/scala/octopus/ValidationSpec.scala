@@ -3,10 +3,11 @@ package octopus
 import octopus.example.domain._
 import octopus.dsl._
 import octopus.syntax._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class ValidationSpec
-  extends WordSpec with MustMatchers with Fixtures {
+  extends AnyWordSpec with Matchers with Fixtures {
 
   "Validation" when {
 

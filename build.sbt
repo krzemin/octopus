@@ -7,14 +7,15 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
-  val scala212 = "2.12.8"
+  val scala213 = "2.13.1"
+  val scala212 = "2.12.10"
   val scala211 = "2.11.12"
   val shapeless = "2.3.3"
-  val scalatest = "3.0.8"
-  val cats = "1.6.1"
-  val catsEffect = "1.4.0"
-  val monix = "3.0.0-RC3"
-  val scalaz = "7.2.28"
+  val scalatest = "3.1.1"
+  val cats = "2.0.0"
+  val catsEffect = "2.0.0"
+  val monix = "3.1.0"
+  val scalaz = "7.2.30"
 }
 
 lazy val dependencies = Seq(
@@ -79,10 +80,10 @@ lazy val octopusScalazJS = octopusScalaz.js
 lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
-  scalaVersion := versions.scala212,
-  crossScalaVersions := Seq(versions.scala211, versions.scala212),
+  scalaVersion := versions.scala213,
+  crossScalaVersions := Seq(versions.scala211, versions.scala212, versions.scala213),
   scalacOptions := commonScalacOptions
-) ++ lintUnused
+) ++ lintUnused ++ experimental
 
 lazy val commonScalacOptions = Seq(
   "-deprecation",
@@ -92,17 +93,20 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
-  "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
-  "-Xfuture",
-  "-Xexperimental"
+  "-Ywarn-value-discard"
 )
 
 lazy val lintUnused = Seq(
   scalacOptions ++= {
     if (scalaVersion.value <= "2.12.1") Seq() else Seq("-Xlint:-unused")
+  }
+)
+
+lazy val experimental = Seq(
+  scalacOptions ++= {
+    if (scalaVersion.value < "2.12.0") Seq("-Xexperimental") else Seq()
   }
 )
 

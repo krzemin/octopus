@@ -3,12 +3,13 @@ package octopus.scalaz
 import octopus.example.domain._
 import octopus.syntax._
 import octopus.{Fixtures, ValidationError}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scalaz.{NonEmptyList, Validation}
 
 
 class ScalazIntegrationSpec
-  extends WordSpec with MustMatchers with Fixtures {
+  extends AnyWordSpec with Matchers with Fixtures {
 
   "Scalaz Integration" should {
     "support ValidationNel" when {

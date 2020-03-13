@@ -24,14 +24,14 @@ object DerivedValidator extends LowPriorityValidatorDerivation {
     (opt: Option[T]) => opt.map(v.validate).getOrElse(Nil)
   }
 
-  implicit def traversableValidator[T, M[S] <: Traversable[S]](implicit v: Validator[T]): DerivedValidator[M[T]] = DerivedValidator {
+  implicit def IterableValidator[T, M[S] <: Iterable[S]](implicit v: Validator[T]): DerivedValidator[M[T]] = DerivedValidator {
     (elems: M[T]) =>
       elems.toList.zipWithIndex.flatMap { case (elem, idx) =>
         v.validate(elem).map(CollectionIndex(idx) :: _)
       }
   }
 
-  implicit def arrayValidator[T](implicit tv: Validator[Traversable[T]]): DerivedValidator[Array[T]] = DerivedValidator {
+  implicit def arrayValidator[T](implicit tv: Validator[Iterable[T]]): DerivedValidator[Array[T]] = DerivedValidator {
     (elems: Array[T]) => tv.validate(elems)
   }
 

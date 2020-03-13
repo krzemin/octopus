@@ -7,7 +7,8 @@ import octopus.example.domain.{Email, User}
 import octopus.syntax._
 import octopus.{AsyncValidator => _, Validator => _, _}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{AsyncWordSpec, MustMatchers}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 
 import scala.concurrent.Future
 
@@ -16,7 +17,7 @@ class AsyncValidationRulesSpec
   extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
-  with MustMatchers {
+  with Matchers {
 
   private def userThrowNonFatal(user: User): Future[Boolean] = Future.failed(new Exception(Exception_HandledDuringValidation))
   private def validateUserEither(user: User): Future[Either[String, Boolean]] = Future.successful { user.email match {
@@ -61,7 +62,7 @@ class AsyncValidationRulesSpec
 
         val expectedValidationError = ValidationError(
           message = Email_Err_DoesNotContainA,
-          path = FieldPath(List(FieldLabel('email)))
+          path = FieldPath(List(FieldLabel(Symbol("email"))))
         )
 
         user_Valid.isValidAsync.map(_ mustBe false)
