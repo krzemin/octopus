@@ -27,8 +27,11 @@ object dsl {
     def composeSuper[U >: T](v2: Validator[U]): Validator[T] =
       (obj: T) => v.validate(obj) ++ v2.validate(obj)
 
-    def composeDerived(implicit dv: DerivedValidator[T]): Validator[T] =
-      compose(dv.v)
+//    def composeDerived(implicit dv: DerivedValidator[T]): Validator[T] =
+//      compose(dv.v)
+
+    def composeDerived(implicit dv: Validator[T]): Validator[T] =
+      compose(dv)
 
     def comap[U](f: U => T): Validator[U] =
       (value: U) => v.validate(f(value))
@@ -87,8 +90,8 @@ object dsl {
         }
       }
 
-    def composeDerived(implicit dav: DerivedAsyncValidator[M, T], app: AppError[M]): AsyncValidatorM[M, T] =
-      compose(dav.av)
+    def composeDerived(implicit dav: AsyncValidatorM[M, T], app: AppError[M]): AsyncValidatorM[M, T] =
+      compose(dav)
 
     def comap[U](f: U => T)(implicit appError: AppError[M]): AsyncValidatorM[M, U] =
       AsyncValidatorM.instance[M, U] { value: U =>
@@ -152,8 +155,8 @@ object dsl {
         }
       }
 
-    def composeDerived(implicit dv: DerivedValidator[T], appError: AppError[M]): AsyncValidatorM[M, T] =
-      compose(dv.v)
+    def composeDerived(implicit dv: Validator[T], appError: AppError[M]): AsyncValidatorM[M, T] =
+      compose(dv)
 
     def comap[U](f: U => T)(implicit appError: AppError[M]): AsyncValidatorM[M, U] =
       AsyncValidatorM.instance[M, U] { value: U =>

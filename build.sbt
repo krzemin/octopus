@@ -7,9 +7,10 @@ lazy val root = project.in(file("."))
   .dependsOn(octopusJVM, octopusJS, octopusCatsJVM, octopusCatsJS, octopusScalazJVM, octopusScalazJS)
 
 lazy val versions = new {
-  val scala212 = "2.12.8"
+  val scala212 = "2.12.10"
   val scala211 = "2.11.12"
   val shapeless = "2.3.3"
+  val magnolia = "0.12.8"
   val scalatest = "3.0.8"
   val cats = "1.6.1"
   val catsEffect = "1.4.0"
@@ -19,6 +20,7 @@ lazy val versions = new {
 
 lazy val dependencies = Seq(
   libraryDependencies += "com.chuusai" %%% "shapeless" % versions.shapeless,
+  libraryDependencies += "com.propensive" %%% "magnolia" % versions.magnolia,
   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   libraryDependencies += "org.scalatest" %%% "scalatest" % versions.scalatest % "test"
 )
