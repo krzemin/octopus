@@ -1,0 +1,43 @@
+name: CI build
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        scala:
+          - 2.11.12
+          - 2.12.11
+          - 2.13.1
+        jvm:
+          - openjdk@8
+          - openjdk@1.14
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache .jabba
+        id: cache-jabba
+        uses: actions/cache@v1
+        with:
+          path: ~/.jabba
+          key: ${{ runner.os }}-jabba
+      - name: Cache .sbt
+        id: cache-sbt
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt
+      - name: Set up ${{ matrix.jvm }}
+        uses: olafurpg/setup-scala@v5
+        with:
+          java-version: ${{ matrix.jvm }}
+      - name: Build and run tests
+        run: sbt ++${{ matrix.scala }} clean coverage test coverageReport
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
