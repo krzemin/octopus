@@ -1,6 +1,6 @@
 # Octopus
 
-[![Build Status](https://travis-ci.org/krzemin/octopus.svg?branch=master)](https://travis-ci.org/krzemin/octopus)
+[![CI build](https://github.com/krzemin/octopus/workflows/CI%20build/badge.svg)](https://github.com/krzemin/octopus/actions?query=workflow%3A%22CI+build%22)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.krzemin/octopus_2.13.svg)](http://search.maven.org/#search%7Cga%7C1%7Coctopus)
 [![codecov.io](http://codecov.io/github/krzemin/octopus/coverage.svg?branch=master)](http://codecov.io/github/krzemin/octopus?branch=master)
 [![License](http://img.shields.io/:license-Apache%202-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
