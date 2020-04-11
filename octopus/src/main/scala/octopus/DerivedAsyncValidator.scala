@@ -3,11 +3,9 @@ package octopus
 import shapeless.labelled.FieldType
 import shapeless.{::, HList, HNil, LabelledGeneric, Lazy, Witness}
 
-import scala.language.higherKinds
-
 class DerivedAsyncValidator[M[_], T](val av: AsyncValidatorM[M, T]) extends AnyVal
 
-object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
+object DerivedAsyncValidator {
 
   def apply[M[_]: AppError, T](av: AsyncValidatorM[M, T]): DerivedAsyncValidator[M, T] = new DerivedAsyncValidator[M, T](av)
 
@@ -40,10 +38,4 @@ object DerivedAsyncValidator extends LowPriorityAsyncValidatorDerivation {
         dav.value.av.validate(gen.to(obj))
       }
     }
-}
-
-trait LowPriorityAsyncValidatorDerivation extends Serializable{
-
-  implicit def fromSyncValidator[M[_]: AppError, T](implicit v: Validator[T]): DerivedAsyncValidator[M, T] =
-    DerivedAsyncValidator(AsyncValidatorM.lift(v))
 }

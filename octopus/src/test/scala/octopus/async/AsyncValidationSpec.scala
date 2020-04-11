@@ -7,11 +7,12 @@ import octopus.dsl._
 import octopus.example.domain._
 import octopus.syntax._
 import octopus.{AppError, FieldLabel, FieldPath, Fixtures, ValidationError}
-import org.scalatest.{AsyncWordSpec, MustMatchers}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 
 import scala.language.higherKinds
 
-abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fixtures with MustMatchers {
+abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fixtures with Matchers {
 
   implicit def appError: AppError[M]
 
@@ -29,7 +30,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
 
   private val geoServiceStub = new GeoService[M] {
     def doesPostalCodeExist(postalCode: PostalCode.T): M[Boolean] =
-      AppError[M].pure(postalCode.size == 5 && postalCode.groupBy(identity).size == 1)
+      AppError[M].pure(postalCode.size == 5 && postalCode.toCharArray.groupBy(identity).size == 1)
 
     def isPostalCodeValidForCity(postalCode: PostalCode.T, city: String): M[Boolean] = {
       if(city == "Los Angeles") {
@@ -89,7 +90,7 @@ abstract class AsyncValidationSpec[M[_]: ToFuture] extends AsyncWordSpec with Fi
 
     val expectedValidationException = ValidationError(
       message = Exception_HandledDuringValidation,
-      path = FieldPath(List(FieldLabel('email)))
+      path = FieldPath(List(FieldLabel(Symbol("email"))))
     )
 
     def validateEmailF(email: Email): M[Boolean] =

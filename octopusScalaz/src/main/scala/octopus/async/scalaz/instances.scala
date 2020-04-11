@@ -22,6 +22,6 @@ object instances {
       me.apply2(ma, mb)(f)
 
     def recover[A, B <: A](ma: M[A], f: PartialFunction[Throwable, B]): M[A] =
-      me.handleError(ma)(f.andThen(pure)) // TODO: partial function composed with pure gives pure? :>
+      me.handleError(ma)(f.andThen(pure(_))) // TODO: partial function composed with pure gives pure? :>
   }
 }

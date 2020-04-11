@@ -1,9 +1,10 @@
 package octopus
 
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 
-class FieldPathSpec extends WordSpec with MustMatchers{
+class FieldPathSpec extends AnyWordSpec with Matchers{
 
   val PNil = FieldPath.empty
 
@@ -18,18 +19,18 @@ class FieldPathSpec extends WordSpec with MustMatchers{
 
       "support field names" in {
 
-        (FieldLabel('label1) :: PNil).asString mustBe "label1"
+        (FieldLabel(Symbol("label1")) :: PNil).asString mustBe "label1"
       }
 
       "support collection indexes in array notation" in {
 
-        (FieldLabel('label1) :: CollectionIndex(5) :: FieldLabel('label2) :: PNil).asString mustBe
+        (FieldLabel(Symbol("label1")) :: CollectionIndex(5) :: FieldLabel(Symbol("label2")) :: PNil).asString mustBe
           "label1[5].label2"
       }
 
       "support map keys in array notation" in {
 
-        (FieldLabel('label1) :: MapKey("some key") :: FieldLabel('label2) :: PNil).asString mustBe
+        (FieldLabel(Symbol("label1")) :: MapKey("some key") :: FieldLabel(Symbol("label2")) :: PNil).asString mustBe
           "label1[some key].label2"
       }
     }

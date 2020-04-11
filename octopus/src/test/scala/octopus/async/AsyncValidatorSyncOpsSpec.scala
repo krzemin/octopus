@@ -5,7 +5,8 @@ import octopus.example.domain.{Age, Email, User}
 import octopus.syntax._
 import octopus.{AsyncValidator, Fixtures, ValidationError}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{AsyncWordSpec, MustMatchers}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 
 import scala.util.{Failure, Success, Try}
 
@@ -13,7 +14,7 @@ class AsyncValidatorMSyncOpsSpec
   extends AsyncWordSpec
   with ScalaFutures
   with Fixtures
-  with MustMatchers {
+  with Matchers {
 
 
   "AsyncValidatorMSyncOps" when {

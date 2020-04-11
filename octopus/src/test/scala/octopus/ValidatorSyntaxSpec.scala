@@ -3,13 +3,14 @@ package octopus
 import octopus.example.domain._
 import octopus.dsl._
 import octopus.syntax._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import shapeless.tag.@@
 import shapeless.test.illTyped
 
 
 class ValidatorSyntaxSpec
-  extends WordSpec with MustMatchers with Fixtures {
+  extends AnyWordSpec with Matchers with Fixtures {
 
   "Validator Syntax" should {
 
@@ -59,7 +60,7 @@ class ValidatorSyntaxSpec
 
       def doSomethingWithEmail(email: Email @@ Valid): Unit = ()
 
-      email_Valid.validate.toTaggedEither[Valid].right.foreach(doSomethingWithEmail)
+      email_Valid.validate.toTaggedEither[Valid].fold(_ => (()), doSomethingWithEmail)
 
       illTyped("email_Valid.validate.toEither.right.foreach(doSomethingWithEmail)")
     }
