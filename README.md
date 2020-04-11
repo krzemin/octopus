@@ -1,7 +1,7 @@
 # Octopus
 
 [![Build Status](https://travis-ci.org/krzemin/octopus.svg?branch=master)](https://travis-ci.org/krzemin/octopus)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.krzemin/octopus_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Coctopus)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.krzemin/octopus_2.13.svg)](http://search.maven.org/#search%7Cga%7C1%7Coctopus)
 [![codecov.io](http://codecov.io/github/krzemin/octopus/coverage.svg?branch=master)](http://codecov.io/github/krzemin/octopus?branch=master)
 [![License](http://img.shields.io/:license-Apache%202-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -94,18 +94,18 @@ user2.validate.toFieldErrMapping
 
 ### Getting started
 
-Octopus is currently available for Scala 2.11, 2.12 and Scala.js.
+Octopus is currently available for Scala 2.11, 2.12, 2.13 and Scala.js.
 
 To get started with SBT, add following line to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %% "octopus" % "0.4.0"
+libraryDependencies += "com.github.krzemin" %% "octopus" % "0.4.1"
 ```
 
 Or if you are using Scala.js:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.4.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus" % "0.4.1"
 ```
 
 ### Integration with Cats / Scalaz
@@ -118,7 +118,7 @@ Cats and Scalaz validation types.
 If you want to integrate with Cats, simply add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.4.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-cats" % "0.4.1"
 ```
 
 Having this dependency on classpath, you can use 
@@ -141,7 +141,7 @@ for more information.
 Alternatively, if you want similar integration with Scalaz, add following line to `build.sbt`:
 
 ```scala
-libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.4.0"
+libraryDependencies += "com.github.krzemin" %%% "octopus-scalaz" % "0.4.1"
 ```
 
 See [integration test suite](https://github.com/krzemin/octopus/blob/master/octopusScalaz/src/test/scala/octopus/scalaz/ScalazIntegrationSpec.scala)
@@ -257,7 +257,7 @@ composability:
 
 ## License
 
-Copyright 2016-2019 Piotr Krzemiński
+Copyright 2016-2020 Piotr Krzemiński
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
