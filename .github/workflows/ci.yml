@@ -41,7 +41,7 @@ jobs:
         with:
           java-version: ${{ matrix.jvm }}
       - name: Build and run tests
-        run: sbt ++${{ matrix.scala }} clean coverage test coverageReport
+        run: sbt ++${{ matrix.scala }} clean compile octopusJS/test octopusCatsJS/test octopusScalazJS/test coverage octopusJVM/test octopusCatsJVM/test octopusScalazJVM/test octopusJVM/coverageReport octopusCatsJVM/coverageReport octopusScalazJVM/coverageReport
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
