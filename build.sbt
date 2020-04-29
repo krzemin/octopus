@@ -9,12 +9,11 @@ lazy val root = project.in(file("."))
 lazy val versions = new {
   val scala213 = "2.13.1"
   val scala212 = "2.12.11"
-  val scala211 = "2.11.12"
   val shapeless = "2.3.3"
   val scalatest = "3.1.1"
-  val cats = "2.0.0"
-  val catsEffect = "2.0.0"
-  val monix = "3.1.0"
+  val cats = "2.1.1"
+  val catsEffect = "2.1.3"
+  val monix = "3.2.0"
   val scalaz = "7.2.30"
 }
 
@@ -81,7 +80,7 @@ lazy val coreSettings = commonSettings ++ publishSettings
 
 lazy val commonSettings = Seq(
   scalaVersion := versions.scala213,
-  crossScalaVersions := Seq(versions.scala211, versions.scala212, versions.scala213),
+  crossScalaVersions := Seq(versions.scala212, versions.scala213),
   scalacOptions := commonScalacOptions
 ) ++ lintUnused ++ experimental
 
