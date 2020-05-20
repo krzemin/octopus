@@ -10,7 +10,7 @@ package object scalaz {
       case Nil =>
         Validation.success(vr.value)
       case head :: tail =>
-        Validation.failure(NonEmptyList.nels(head, tail : _*))
+        Validation.failure(NonEmptyList.fromSeq(head, tail))
     }
 
     def toValidation: Validation[List[ValidationError], T] = vr.errors match {
