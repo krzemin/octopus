@@ -2,4 +2,14 @@ project/project
 project/target
 target
 .idea
+logs
 
+# Metals & VSCode #
+/.classpath
+/.project
+/.settings
+/.metals
+/.g8
+/.bloop
+/RUNNING_PID
+settings.json
