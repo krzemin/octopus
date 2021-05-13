@@ -12,7 +12,7 @@ lazy val versions = new {
   val shapeless = "2.3.3"
   val scalatest = "3.2.2"
   val cats = "2.2.0"
-  val catsEffect = "2.2.0"
+  val catsEffect = "2.5.1"
   val monix = "3.2.2"
   val scalaz = "7.2.30"
 }
