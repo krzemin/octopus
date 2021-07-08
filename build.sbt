@@ -14,7 +14,7 @@ lazy val versions = new {
   val cats = "2.2.0"
   val catsEffect = "2.2.0"
   val monix = "3.2.2"
-  val scalaz = "7.2.30"
+  val scalaz = "7.2.33"
 }
 
 lazy val dependencies = Seq(
