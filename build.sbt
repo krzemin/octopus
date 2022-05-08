@@ -13,7 +13,7 @@ lazy val versions = new {
   val scalatest = "3.2.2"
   val cats = "2.2.0"
   val catsEffect = "2.2.0"
-  val monix = "3.2.2"
+  val monix = "3.4.1"
   val scalaz = "7.2.30"
 }
 
